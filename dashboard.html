@@ -392,7 +392,7 @@ td.nowrap { white-space: nowrap; }
     `<div class="kpis">
       <button class="kpi hl" type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'><span>Neue Anfragen</span><b>${st.neu}</b><small>${st.pipeline} in Bearbeitung insgesamt</small></button>
       <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"aktiv"}'><span>Offene Aufträge</span><b>${st.offeneAuftraege}</b><small>geplant oder in Arbeit</small></button>
-      <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b>${eur(st.monatUmsatz)}</b><small>einmalige Aufträge, inkl. MwSt.</small></button>
+      <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b>${eur(st.monatUmsatz)}</b><small>einmalige Aufträge</small></button>
       <button class="kpi" type="button" data-go="auftraege"><span>Monatlich wiederkehrend</span><b>${eur(st.mrr)}</b><small>laufende Abos pro Monat</small></button>
       <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"unbezahlt"}'><span>Noch nicht bezahlt</span><b>${eur(st.unbezahlt)}</b><small>fertige Aufträge</small></button>
       <button class="kpi" type="button" data-go="aufgaben" data-patch='{"aufgabenWer":"meine"}'><span>Meine offenen Aufgaben</span><b>${st.meineAufgaben}</b><small>${st.ueberfaellig ? `<span class="overdue">${st.ueberfaellig} überfällig</span>` : "nichts überfällig"}</small></button>
@@ -474,7 +474,7 @@ td.nowrap { white-space: nowrap; }
       ["firma", "Firma *", "text", { req: true }], ["ansprechpartner", "Ansprechpartner", "text"], ["email", "E-Mail", "email"], ["telefon", "Telefon", "tel"],
       ["branche", "Branche", "text"], ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["adresse", "Adresse", "textarea", { full: true }], ["notizen", "Notizen", "textarea", { full: true }]] },
     auftraege: { titel: "Auftrag", fields: () => [
-      ["titel", "Titel *", "text", { req: true, full: true }], ["kunde_id", "Kunde *", "select", { opts: kundenOpts(true), req: true }], ["betrag", "Betrag (€, inkl. MwSt.)", "number"],
+      ["titel", "Titel *", "text", { req: true, full: true }], ["kunde_id", "Kunde *", "select", { opts: kundenOpts(true), req: true }], ["betrag", "Betrag (€)", "number"],
       ["art", "Abrechnung", "select", { opts: sel(["einmalig", "monatlich"]) }], ["status", "Status", "select", { opts: sel(["geplant", "in_arbeit", "fertig", "storniert"]) }],
       ["rechnung", "Rechnung", "select", { opts: sel(["offen", "gestellt", "bezahlt"]) }], ["abgabe_am", "Abgabe bis", "date"],
       ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["notiz", "Notiz", "textarea", { full: true }]] },

@@ -601,7 +601,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
         <div class="extra"><div><b>Social-Media-Betreuung</b><span>249 € / Monat</span></div><button class="btn-mini" type="button" data-add="social" data-label="Hinzufügen" data-added="✓ Hinzugefügt">Hinzufügen</button></div>
         <div class="extra deal"><b>30 % Gründerrabatt</b><span>für die ersten 3 Kunden</span></div>
       </div>
-      <p class="tax-note">Alle Preise sind Festpreise inkl. 19 % MwSt.</p>
+      <p class="tax-note">Alle Preise sind Festpreise.</p>
     </div>
   </section>
 
@@ -641,7 +641,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
         </details>
         <details>
           <summary>Was kostet es danach?</summary>
-          <p>Nichts, wenn du nichts weiter brauchst. Optional gibt es Website-Wartung für 39 € und Social-Media-Betreuung für 249 € im Monat, jeweils inkl. MwSt.</p>
+          <p>Nichts, wenn du nichts weiter brauchst. Optional gibt es Website-Wartung für 39 € und Social-Media-Betreuung für 249 € im Monat.</p>
         </details>
       </div>
     </div>
@@ -1210,7 +1210,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     const sum = `<div class="sum">
         <div><span>Einmalig</span><b>${eur(t.once)}</b></div>
         ${t.monthly ? `<div><span>Monatlich</span><b>${eur(t.monthly)}</b></div>` : ""}
-        <small>Alle Preise inkl. 19 % MwSt. Die Anfrage ist unverbindlich.</small>
+        <small>Die Anfrage ist unverbindlich.</small>
       </div>`;
 
     if (step === 1) {
@@ -1298,7 +1298,7 @@ ${sentVia === "db" ? `<h3>Danke, ${esc(sentName)}!</h3>
       "AUSWAHL",
       ...cart.map((id) => "- " + CATALOG[id].name + ": " + eur(CATALOG[id].price) + (CATALOG[id].monthly ? " / Monat" : "")),
       "",
-      "Einmalig: " + eur(t.once) + (t.monthly ? " | Monatlich: " + eur(t.monthly) : "") + " (inkl. MwSt.)",
+      "Einmalig: " + eur(t.once) + (t.monthly ? " | Monatlich: " + eur(t.monthly) : ""),
       "Gründerrabatt gewünscht: " + (draft.rabatt ? "ja" : "nein"),
       "",
       "KONTAKT",
