@@ -409,6 +409,20 @@ details[open] summary::after { transform: rotate(45deg); }
 details p { color: var(--muted); margin-top: 12px; max-width: 62ch; }
 
 .contact { background: var(--hero-bg); color: var(--hero-fg); }
+.modal { width: min(980px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; border: 1px solid #2F4F3A; border-radius: 24px; padding: 48px; overflow: auto; box-shadow: 0 40px 100px rgba(0, 0, 0, .45); }
+.modal[open] { animation: modalIn .4s cubic-bezier(.2, .7, .2, 1); }
+.modal::backdrop { background: rgba(19, 36, 26, .6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+@keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
+.modal-close { position: absolute; top: 16px; right: 16px; color: var(--hero-fg); border-color: #46684F; }
+.modal-close:hover { background: #2A4E37; }
+@media (max-width: 640px) { .modal { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; padding: calc(64px + env(safe-area-inset-top, 0px)) 20px calc(28px + env(safe-area-inset-bottom, 0px)); } }
+.contact-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.contact-btn { background: transparent; white-space: nowrap; }
+.nav .contact-btn { border-width: 1px; }
+.nav .contact-btn.btn-sun { background: var(--sun); border-color: var(--sun); }
+.nav .btn { white-space: nowrap; }
+.modal:focus-visible { outline: none; }
+@media (max-width: 640px) { .nav .contact-btn { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 12px; } .nav .contact-btn span { display: none; } }
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
 @media (max-width: 820px) { .contact-grid { grid-template-columns: 1fr; gap: 36px; } }
 .contact-grid > * { min-width: 0; }
@@ -449,9 +463,13 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <li><a href="#pakete">Pakete</a></li>
       <li><a href="#ablauf">Ablauf</a></li>
       <li><a href="#faq">Fragen</a></li>
-      <li class="only-mobile"><a href="#kontakt">Kontakt</a></li>
+      <li class="only-mobile"><a href="#kontakt" data-contact>Kontakt</a></li>
     </ul>
     <div class="nav-end">
+      <button class="btn btn-ghost contact-btn" id="contact-btn" type="button" data-contact aria-haspopup="dialog" aria-label="Kontakt">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>
+        <span>Kontakt</span>
+      </button>
       <a class="btn btn-sun" href="#kontakt" id="book">Termin buchen</a>
       <button class="cart-btn" type="button" id="cart-btn" aria-haspopup="dialog" aria-label="Anfragewagen öffnen, 0 Positionen">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1.2 12h-10.6z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
@@ -630,11 +648,14 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   </section>
 </main>
 
-<section class="contact" id="kontakt">
-  <div class="wrap contact-grid">
+<dialog class="contact modal" id="kontakt" aria-labelledby="contact-title">
+  <button class="dr-close modal-close" type="button" aria-label="Kontakt schließen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+  <div class="contact-grid">
     <div>
       <span class="eyebrow" style="color:var(--hero-muted)">Kontakt</span>
-      <h2 style="margin-top:14px">Lass uns über deine Marke reden.</h2>
+      <h2 id="contact-title" style="margin-top:14px">Lass uns über deine Marke reden.</h2>
       <p class="lead">Das Erstgespräch ist kostenlos und unverbindlich. Schreib uns kurz, worum es geht, wir melden uns innerhalb eines Werktags.</p>
       <div class="person">
         <div class="mono" aria-hidden="true">n<b>n</b></div>
@@ -664,7 +685,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <p class="sent" id="sent" role="status" hidden></p>
     </form>
   </div>
-</section>
+</dialog>
 
 <footer class="on-light">
   <div class="wrap foot">
@@ -880,7 +901,9 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   if (CONFIG.calendly) {
     book.href = CONFIG.calendly; book.target = "_blank"; book.rel = "noopener";
   } else {
-    book.textContent = "Anfrage stellen";
+    // Ohne Calendly würde der Button nur dasselbe tun wie „Kontakt“ – dann wird Kontakt der Hauptbutton
+    book.hidden = true;
+    $("contact-btn").classList.replace("btn-ghost", "btn-sun");
   }
 
   // Formular: öffnet das Mailprogramm mit vorausgefüllter Nachricht
@@ -912,11 +935,35 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     out.textContent = "Danke, " + name + "! Dein E-Mail-Programm sollte sich jetzt öffnen. Schick die Nachricht dort ab, dann melden wir uns innerhalb eines Werktags. Falls sich nichts öffnet, schreib uns direkt an " + CONFIG.email + ".";
   });
 
+  // Kontakt-Fenster
+  const contactDlg = $("kontakt");
+  function openContact() {
+    const topbarEl = $("topbar"), mb = $("menu-btn");
+    if (topbarEl.classList.contains("open")) mb.click();
+    if (!contactDlg.open) contactDlg.showModal();
+    document.documentElement.classList.add("lock");
+    if (canHover) $("f-name").focus();
+  }
+  contactDlg.addEventListener("close", () => {
+    document.documentElement.classList.remove("lock");
+    if (location.hash === "#kontakt") history.replaceState(null, "", location.pathname + location.search);
+  });
+  contactDlg.addEventListener("click", (e) => {
+    if (e.target === contactDlg || e.target.closest(".modal-close")) contactDlg.close();
+  });
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest('a[href="#kontakt"], [data-contact]');
+    if (!t) return;
+    e.preventDefault();
+    openContact();
+  });
+  if (location.hash === "#kontakt") openContact();
+
   /* ===== Bewegung & Effekte ===== */
 
   // Kopfleiste: wird beim Scrollen fest, zeigt Fortschritt und aktiven Bereich
   const topbar = $("topbar"), progress = $("progress"), menuBtn = $("menu-btn");
-  const navLinks = [...document.querySelectorAll('.nav ul a[href^="#"]')];
+  const navLinks = [...document.querySelectorAll('.nav ul a[href^="#"]:not([data-contact])')];
   const navTargets = navLinks.map((a) => document.querySelector(a.getAttribute("href")));
   let ticking = false;
   function onScroll() {
@@ -1005,7 +1052,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   }
 
   // Inhalte blenden beim Scrollen versetzt ein
-  const revealSel = [".sec-head", ".why > div", ".kit-tabs", ".kit", ".kit-note", ".pkg", ".extra", ".tax-note", "details", ".contact-grid > *"].join(",");
+  const revealSel = [".sec-head", ".why > div", ".kit-tabs", ".kit", ".kit-note", ".pkg", ".extra", ".tax-note", "details"].join(",");
   if (!reduce && "IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => entries.forEach((e) => {
       if (!e.isIntersecting) return;
