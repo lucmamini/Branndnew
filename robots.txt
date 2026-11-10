@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /dashboard.html
+Disallow: /impressum.html
+Disallow: /datenschutz.html
