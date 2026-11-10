@@ -1,15 +1,15 @@
 /* Gemeinsame Styles für Impressum und Datenschutz – gleiche Tokens wie index.html */
 :root {
-  --navy: #10264A; --sky: #6EC6FF; --sun: #FFD84D;
-  --bg: #F2F8FF; --fg: #10264A; --muted: #4A5B78; --line: #D3E3F5; --accent-ink: #1E8FE6;
+  --navy: #1F3D2B; --sky: #A8C5A0; --sun: #F2E863;
+  --bg: #F7F7F2; --fg: #1F3D2B; --muted: #55635A; --line: #DDE3D6; --accent-ink: #2F6B45;
   --mark-bg: #FFF1B3;
   --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
   --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #0A1A33; --fg: #FFFFFF; --muted: #A9BAD6; --line: #22406E; --accent-ink: #6EC6FF; --mark-bg: #5A4A10; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --bg: #13241A; --fg: #FFFFFF; --muted: #B5C7B4; --line: #2F4F3A; --accent-ink: #A8C5A0; --mark-bg: #5A4A10; color-scheme: dark; }
 }
-:root[data-theme="dark"] { --bg: #0A1A33; --fg: #FFFFFF; --muted: #A9BAD6; --line: #22406E; --accent-ink: #6EC6FF; --mark-bg: #5A4A10; color-scheme: dark; }
+:root[data-theme="dark"] { --bg: #13241A; --fg: #FFFFFF; --muted: #B5C7B4; --line: #2F4F3A; --accent-ink: #A8C5A0; --mark-bg: #5A4A10; color-scheme: dark; }
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 400 17px/1.65 var(--body); }
@@ -21,7 +21,7 @@ a { color: var(--accent-ink); }
 .bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 20px; max-width: 1120px; }
 .wordmark { font: 700 24px/1 var(--display); letter-spacing: -0.03em; color: #fff; text-decoration: none; }
 .wordmark .nn { color: var(--sun); }
-.back { color: #B9C9E2; text-decoration: none; font-weight: 600; font-size: 15px; }
+.back { color: #C3D2BF; text-decoration: none; font-weight: 600; font-size: 15px; }
 .back:hover { color: #fff; }
 
 .doc { padding-block: 56px 72px; }
