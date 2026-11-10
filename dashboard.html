@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · BranndNew</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1F3D2B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F3D2B'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='32' fill='%23FFFFFF'%3En%3Ctspan fill='%23F2E863'%3En%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root {
+  --navy: #1F3D2B; --sky: #A8C5A0; --sun: #F2E863;
+  --bg: #F7F7F2; --surface: #FFFFFF; --fg: #1F3D2B; --muted: #55635A; --line: #DDE3D6; --accent-ink: #2F6B45;
+  --hover: #EEF2EA; --err: #C62828; --warn-bg: #FFF4D6; --warn-fg: #7A5A00;
+  --side-fg: #FFFFFF; --side-muted: #C3D2BF; --side-line: #2F4F3A; --side-hover: #2A4E37;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #13241A; --surface: #1A3022; --fg: #FFFFFF; --muted: #B5C7B4; --line: #2F4F3A; --accent-ink: #A8C5A0; --hover: #213A2A; --err: #FF8A8A; --warn-bg: #3D3410; --warn-fg: #F2E863; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #13241A; --surface: #1A3022; --fg: #FFFFFF; --muted: #B5C7B4; --line: #2F4F3A; --accent-ink: #A8C5A0; --hover: #213A2A; --err: #FF8A8A; --warn-bg: #3D3410; --warn-fg: #F2E863; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.5 var(--body); }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 0; }
+p { margin: 0; }
+a { color: var(--accent-ink); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+.wordmark { font: 700 22px/1 var(--display); letter-spacing: -0.03em; color: var(--side-fg); white-space: nowrap; }
+.wordmark .nn { color: var(--sun); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; line-height: 1; padding: 11px 16px; border-radius: 999px; border: 1.5px solid transparent; background: var(--navy); color: #fff; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn:hover { filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn-sun { background: var(--sun); color: var(--navy); }
+.btn-line { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn-line:hover { background: var(--hover); filter: none; }
+.btn-danger { background: transparent; color: var(--err); border-color: currentColor; }
+.btn-sm { padding: 8px 12px; font-size: 13px; }
+
+/* Login / Setup */
+.gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--navy); }
+.gate-card { width: min(420px, 100%); background: var(--surface); border-radius: 22px; padding: 32px; box-shadow: 0 30px 80px rgba(0,0,0,.3); }
+.gate-card .wordmark { color: var(--fg); display: block; margin-bottom: 22px; }
+.gate-card .wordmark .nn { color: var(--accent-ink); }
+.gate-card h1 { font-size: 26px; margin-bottom: 6px; }
+.gate-card > p { color: var(--muted); margin-bottom: 20px; }
+.gate-card ol { padding-left: 20px; color: var(--muted); display: grid; gap: 8px; margin: 0 0 8px; }
+.gate-card code { font-size: 13px; background: var(--hover); padding: 1px 6px; border-radius: 6px; }
+
+/* Formulare */
+.fields { display: grid; gap: 14px; }
+.fields.two { grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .fields.two { grid-template-columns: 1fr; } }
+.fields .full { grid-column: 1 / -1; }
+label.f { display: grid; gap: 6px; font-weight: 600; font-size: 13px; color: var(--muted); }
+label.f input, label.f select, label.f textarea { font-size: 15px; font-weight: 400; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+label.f textarea { min-height: 90px; resize: vertical; }
+label.f input:focus, label.f select:focus, label.f textarea:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(47, 107, 69, .22); }
+label.chk { display: flex; gap: 10px; align-items: center; font-weight: 600; font-size: 14px; }
+label.chk input { width: 18px; height: 18px; accent-color: var(--accent-ink); margin: 0; }
+.msg-err { color: var(--err); font-size: 14px; font-weight: 600; }
+
+/* App-Layout */
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
+.app > * { min-width: 0; }
+.mobile-me { display: none; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+.side { background: var(--navy); color: var(--side-fg); padding: 24px 16px; display: flex; flex-direction: column; gap: 26px; position: sticky; top: 0; height: 100vh; }
+.side .wordmark { padding-inline: 10px; }
+.side .wordmark small { display: block; font: 600 11px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--side-muted); margin-top: 8px; }
+.side nav { display: grid; gap: 4px; }
+.side nav button { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; background: transparent; border: 0; color: var(--side-muted); font-weight: 600; font-size: 15px; padding: 11px 12px; border-radius: 12px; cursor: pointer; }
+.side nav button:hover { background: var(--side-hover); color: var(--side-fg); }
+.side nav button[aria-current="page"] { background: var(--side-hover); color: var(--side-fg); box-shadow: inset 3px 0 0 var(--sun); }
+.side nav .cnt { background: var(--sun); color: var(--navy); font-size: 12px; font-weight: 700; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; }
+.side .me { margin-top: auto; border-top: 1px solid var(--side-line); padding: 16px 10px 0; display: grid; gap: 10px; font-size: 14px; color: var(--side-muted); }
+.side .me strong { color: var(--side-fg); display: block; font-size: 15px; }
+.side .me a, .side .me button { color: var(--side-muted); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; font-size: 14px; text-decoration: underline; }
+.side .me a:hover, .side .me button:hover { color: var(--side-fg); }
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: sticky; top: 0; z-index: 20; height: auto; padding: 14px 16px 10px; gap: 12px; }
+  .side .wordmark small, .side .me { display: none; }
+  .side nav { display: flex; overflow-x: auto; gap: 6px; scrollbar-width: none; }
+  .side nav button { width: auto; flex: none; padding: 9px 12px; font-size: 14px; }
+  .side nav button[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--sun); }
+  .main .mobile-me { display: flex; }
+}
+.mobile-me button { background: none; border: 0; color: var(--accent-ink); text-decoration: underline; cursor: pointer; padding: 0; }
+
+.main { padding: 32px clamp(16px, 3.5vw, 44px) 64px; min-width: 0; }
+.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.head h1 { font-size: clamp(26px, 3vw, 34px); }
+.head p { color: var(--muted); margin-top: 4px; }
+.head .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* KPI-Kacheln */
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 26px; }
+@media (max-width: 1000px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; text-align: left; cursor: pointer; display: grid; gap: 6px; }
+.kpi:hover { border-color: var(--accent-ink); }
+.kpi span { color: var(--muted); font-size: 13px; font-weight: 600; }
+.kpi b { font: 700 30px/1.05 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kpi small { color: var(--muted); font-size: 12.5px; }
+.kpi.hl { background: var(--navy); border-color: var(--navy); color: #fff; }
+.kpi.hl span, .kpi.hl small { color: var(--side-muted); }
+.kpi.hl b { color: var(--sun); }
+
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 1080px) { .panels { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0; }
+.panel-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.panel-h h2 { font-size: 18px; }
+.panel-h button { background: none; border: 0; color: var(--accent-ink); font-weight: 600; cursor: pointer; padding: 4px; }
+
+/* Filter */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chip:hover { border-color: var(--accent-ink); }
+.chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.chip i { font-style: normal; opacity: .7; font-variant-numeric: tabular-nums; }
+.search { flex: 1 1 220px; max-width: 340px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 14px; }
+.search:focus { outline: none; border-color: var(--accent-ink); }
+
+/* Tabellen */
+.tbl-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--hover); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+td.nowrap { white-space: nowrap; }
+.empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+.empty b { display: block; color: var(--fg); font: 700 17px var(--display); margin-bottom: 4px; }
+
+/* Status-Badges: Farbe + Text, nie Farbe allein */
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; color: var(--fg); background: var(--bg); }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.badge.neu::before, .badge.offen::before { background: #D9A400; }
+.badge.in_kontakt::before, .badge.in_arbeit::before, .badge.gestellt::before { background: #3A7BD5; }
+.badge.angebot::before, .badge.geplant::before { background: #8A63D2; }
+.badge.gewonnen::before, .badge.fertig::before, .badge.bezahlt::before { background: #2F8A4E; }
+.badge.verloren::before, .badge.storniert::before { background: #B23A2B; }
+.who { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--sky); color: var(--navy); font-weight: 700; font-size: 12px; }
+.who.none { background: var(--hover); color: var(--muted); }
+.overdue { color: var(--err); font-weight: 600; }
+
+/* Listen (Übersicht, Aufgaben) */
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+.list li:last-child { border-bottom: 0; }
+.list .grow { flex: 1; min-width: 0; cursor: pointer; }
+.list .grow b { display: block; font-weight: 600; }
+.list .grow small { color: var(--muted); font-size: 13px; }
+.list .grow:hover b { text-decoration: underline; }
+.list input[type="checkbox"] { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent-ink); flex: none; cursor: pointer; }
+.list li.done .grow b { text-decoration: line-through; color: var(--muted); }
+.task-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 4px 16px; }
+
+/* Dialog */
+.dlg { width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); border: 0; border-radius: 20px; padding: 0; background: var(--surface); color: var(--fg); box-shadow: 0 40px 100px rgba(0,0,0,.35); }
+.dlg::backdrop { background: rgba(19, 36, 26, .55); backdrop-filter: blur(3px); }
+.dlg form { display: grid; gap: 18px; padding: 24px; }
+.dlg-h { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.dlg-h h2 { font-size: 22px; }
+.dlg-h p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.x { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: transparent; cursor: pointer; flex: none; font-size: 20px; line-height: 1; color: var(--fg); }
+.info { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; font-size: 14px; }
+.info dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.info dt { color: var(--muted); }
+.info dd { margin: 0; overflow-wrap: anywhere; }
+.info .pos { display: flex; justify-content: space-between; gap: 12px; }
+.info .msg { white-space: pre-wrap; }
+.rel h3 { font-size: 16px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.dlg-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; }
+.dlg-foot .r { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, calc(100% + 40px)); visibility: hidden; background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: transform .3s ease; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.toast.show { transform: translate(-50%, 0); visibility: visible; }
+.toast.err { background: var(--err); }
+.loading { color: var(--muted); padding: 40px 0; }
+</style>
+</head>
+<body>
+
+<!-- Setup-Hinweis, falls supabase-config.js noch leer ist -->
+<div class="gate" id="setup" hidden>
+  <div class="gate-card">
+    <span class="wordmark">Bran<span class="nn">n</span>dNew</span>
+    <h1>Dashboard einrichten</h1>
+    <p>Das Dashboard ist noch nicht mit der Datenbank verbunden.</p>
+    <ol>
+      <li>Kostenloses Projekt auf <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a> anlegen (Region: Frankfurt).</li>
+      <li>Im <b>SQL Editor</b> den Inhalt von <code>supabase/schema.sql</code> ausführen.</li>
+      <li>Project URL und den <b>anon/publishable</b> Key in <code>supabase-config.js</code> eintragen.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Login -->
+<div class="gate" id="login" hidden>
+  <form class="gate-card" id="login-form" novalidate>
+    <span class="wordmark">Bran<span class="nn">n</span>dNew</span>
+    <h1>Team-Login</h1>
+    <p>Nur für Luca &amp; Noah.</p>
+    <div class="fields">
+      <label class="f">E-Mail<input type="email" name="email" autocomplete="username" required></label>
+      <label class="f">Passwort<input type="password" name="password" autocomplete="current-password" required></label>
+      <p class="msg-err" id="login-err" role="alert" hidden></p>
+      <button class="btn btn-sun" type="submit">Anmelden</button>
+    </div>
+  </form>
+</div>
+
+<!-- App -->
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <span class="wordmark">Bran<span class="nn">n</span>dNew<small>Team-Dashboard</small></span>
+    <nav id="nav" aria-label="Bereiche">
+      <button type="button" data-view="uebersicht">Übersicht</button>
+      <button type="button" data-view="anfragen">Anfragen <span class="cnt" id="cnt-anfragen" hidden></span></button>
+      <button type="button" data-view="kunden">Kunden</button>
+      <button type="button" data-view="auftraege">Aufträge</button>
+      <button type="button" data-view="aufgaben">Aufgaben <span class="cnt" id="cnt-aufgaben" hidden></span></button>
+    </nav>
+    <div class="me">
+      <div>Angemeldet als<strong id="me-name"></strong></div>
+      <a href="index.html" target="_blank" rel="noopener">Website öffnen</a>
+      <button type="button" data-logout>Abmelden</button>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="mobile-me"><span>Angemeldet als <b id="me-name-m"></b></span><button type="button" data-logout>Abmelden</button></div>
+    <div id="view"><p class="loading">Lade Daten …</p></div>
+  </main>
+</div>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlg-title"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const cfg = window.BN_SUPABASE || {};
+  if (!cfg.url || !cfg.key || !window.supabase) { $("setup").hidden = false; return; }
+  const db = window.supabase.createClient(cfg.url, cfg.key);
+
+  // ---------- Hilfsfunktionen ----------
+  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const eur = (n) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: Number(n) % 1 ? 2 : 0 }).format(Number(n) || 0);
+  const dDate = (s) => s ? new Date(s.length === 10 ? s + "T00:00:00" : s).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }) : "–";
+  const dAgo = (s) => {
+    const d = (Date.now() - new Date(s).getTime()) / 864e5;
+    if (d < 1 / 24) return "gerade eben";
+    if (d < 1) return "vor " + Math.round(d * 24) + " Std.";
+    if (d < 2) return "gestern";
+    if (d < 14) return "vor " + Math.floor(d) + " Tagen";
+    return dDate(s);
+  };
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  const LABEL = {
+    neu: "Neu", in_kontakt: "In Kontakt", angebot: "Angebot", gewonnen: "Gewonnen", verloren: "Verloren",
+    geplant: "Geplant", in_arbeit: "In Arbeit", fertig: "Fertig", storniert: "Storniert",
+    offen: "Offen", gestellt: "Gestellt", bezahlt: "Bezahlt",
+    einmalig: "Einmalig", monatlich: "Monatlich",
+    anfragewagen: "Anfragewagen", kontaktformular: "Kontaktformular", manuell: "Manuell"
+  };
+  const badge = (v) => `<span class="badge ${esc(v)}">${esc(LABEL[v] || v)}</span>`;
+  const who = (n) => n ? `<span class="who" title="${esc(n)}">${esc(n.slice(0, 1).toUpperCase())}</span>` : `<span class="who none" title="Niemand zuständig">–</span>`;
+
+  let toastT = 0;
+  function toast(msg, isErr) {
+    const t = $("toast"); t.textContent = msg; t.classList.toggle("err", !!isErr); t.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3200);
+  }
+
+  // ---------- Zustand ----------
+  const S = { me: null, team: [], anfragen: [], kunden: [], auftraege: [], aufgaben: [] };
+  const UI = { view: "uebersicht", anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenErledigt: false };
+  try { const v = localStorage.getItem("bn-dash-view"); if (v) UI.view = v; } catch (e) {}
+  const kunde = (id) => S.kunden.find((k) => k.id === id);
+  const kName = (id) => { const k = kunde(id); return k ? k.firma : "–"; };
+
+  async function loadAll() {
+    const q = (t) => db.from(t).select("*").order("erstellt_am", { ascending: false });
+    const res = await Promise.all([q("anfragen"), q("kunden"), q("auftraege"), q("aufgaben"), db.from("team").select("*")]);
+    const err = res.find((r) => r.error);
+    if (err) throw err.error;
+    [S.anfragen, S.kunden, S.auftraege, S.aufgaben, S.team] = res.map((r) => r.data || []);
+  }
+
+  async function run(promise, okMsg) {
+    const { error } = await promise;
+    if (error) { toast("Fehler: " + error.message, true); return false; }
+    await loadAll(); render(); if (okMsg) toast(okMsg);
+    return true;
+  }
+
+  // ---------- Login ----------
+  async function start() {
+    const { data } = await db.auth.getSession();
+    if (!data.session) { showLogin(); return; }
+    await enter(data.session.user);
+  }
+  function showLogin() { $("app").hidden = true; $("login").hidden = false; }
+  async function enter(user) {
+    try { await loadAll(); } catch (e) { toast("Daten konnten nicht geladen werden: " + e.message, true); }
+    const mine = S.team.find((t) => t.email.toLowerCase() === (user.email || "").toLowerCase());
+    if (!mine) {
+      await db.auth.signOut();
+      showLogin();
+      const err = $("login-err");
+      err.textContent = "Dieses Konto ist nicht im Team eingetragen. Prüfe die Tabelle „team“ in Supabase.";
+      err.hidden = false;
+      return;
+    }
+    S.me = mine.name;
+    $("me-name").textContent = S.me; $("me-name-m").textContent = S.me;
+    $("login").hidden = true; $("app").hidden = false;
+    render();
+  }
+  $("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = e.target, err = $("login-err"), btn = f.querySelector("button");
+    err.hidden = true; btn.disabled = true;
+    const { data, error } = await db.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
+    btn.disabled = false;
+    if (error) { err.textContent = "Anmeldung fehlgeschlagen. Prüfe E-Mail und Passwort."; err.hidden = false; return; }
+    f.password.value = "";
+    await enter(data.user);
+  });
+  document.querySelectorAll("[data-logout]").forEach((b) => b.addEventListener("click", async () => { await db.auth.signOut(); showLogin(); }));
+
+  // ---------- Navigation ----------
+  $("nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) go(b.dataset.view); });
+  function go(view, patch) {
+    UI.view = view; Object.assign(UI, patch || {});
+    try { localStorage.setItem("bn-dash-view", view); } catch (e) {}
+    render(); window.scrollTo(0, 0);
+  }
+  window.addEventListener("focus", async () => { if (!$("app").hidden && !$("dlg").open) { try { await loadAll(); render(); } catch (e) {} } });
+
+  // ---------- Kennzahlen ----------
+  function stats() {
+    const now = new Date(), ym = now.toISOString().slice(0, 7);
+    const aktiv = S.auftraege.filter((a) => a.status !== "storniert");
+    return {
+      neu: S.anfragen.filter((a) => a.status === "neu").length,
+      pipeline: S.anfragen.filter((a) => ["neu", "in_kontakt", "angebot"].includes(a.status)).length,
+      offeneAuftraege: S.auftraege.filter((a) => ["geplant", "in_arbeit"].includes(a.status)).length,
+      monatUmsatz: aktiv.filter((a) => a.art === "einmalig" && a.erstellt_am.slice(0, 7) === ym).reduce((s, a) => s + Number(a.betrag), 0),
+      mrr: aktiv.filter((a) => a.art === "monatlich" && a.status !== "fertig").reduce((s, a) => s + Number(a.betrag), 0),
+      unbezahlt: aktiv.filter((a) => a.rechnung !== "bezahlt" && a.status === "fertig").reduce((s, a) => s + Number(a.betrag), 0),
+      meineAufgaben: S.aufgaben.filter((t) => !t.erledigt && t.zustaendig === S.me).length,
+      ueberfaellig: S.aufgaben.filter((t) => !t.erledigt && t.faellig_am && t.faellig_am < today()).length
+    };
+  }
+
+  // ---------- Rendern ----------
+  function render() {
+    document.querySelectorAll("#nav [data-view]").forEach((b) => { if (b.dataset.view === UI.view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+    const st = stats();
+    const setCnt = (id, n) => { const el = $(id); el.textContent = n; el.hidden = !n; };
+    setCnt("cnt-anfragen", st.neu); setCnt("cnt-aufgaben", st.meineAufgaben);
+    const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben };
+    $("view").innerHTML = (V[UI.view] || vUebersicht)(st);
+  }
+
+  const head = (title, sub, acts) => `<div class="head"><div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${acts ? `<div class="acts">${acts}</div>` : ""}</div>`;
+  const emptyBox = (t, s) => `<div class="empty"><b>${t}</b>${s}</div>`;
+  const chips = (key, opts, cur) => opts.map(([v, l, n]) => `<button class="chip" type="button" data-filter="${key}" data-val="${v}" aria-pressed="${cur === v}">${l}${n != null ? ` <i>${n}</i>` : ""}</button>`).join("");
+
+  function vUebersicht(st) {
+    const hour = new Date().getHours();
+    const greet = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
+    const neue = S.anfragen.filter((a) => a.status === "neu").slice(0, 5);
+    const tasks = S.aufgaben.filter((t) => !t.erledigt && t.zustaendig === S.me)
+      .sort((a, b) => (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999")).slice(0, 6);
+    return head(`${greet}, ${esc(S.me)}`, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }), `<button class="btn btn-line" type="button" data-reload>Aktualisieren</button>`) +
+    `<div class="kpis">
+      <button class="kpi hl" type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'><span>Neue Anfragen</span><b>${st.neu}</b><small>${st.pipeline} in Bearbeitung insgesamt</small></button>
+      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"aktiv"}'><span>Offene Aufträge</span><b>${st.offeneAuftraege}</b><small>geplant oder in Arbeit</small></button>
+      <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b>${eur(st.monatUmsatz)}</b><small>einmalige Aufträge, inkl. MwSt.</small></button>
+      <button class="kpi" type="button" data-go="auftraege"><span>Monatlich wiederkehrend</span><b>${eur(st.mrr)}</b><small>laufende Abos pro Monat</small></button>
+      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"unbezahlt"}'><span>Noch nicht bezahlt</span><b>${eur(st.unbezahlt)}</b><small>fertige Aufträge</small></button>
+      <button class="kpi" type="button" data-go="aufgaben" data-patch='{"aufgabenWer":"meine"}'><span>Meine offenen Aufgaben</span><b>${st.meineAufgaben}</b><small>${st.ueberfaellig ? `<span class="overdue">${st.ueberfaellig} überfällig</span>` : "nichts überfällig"}</small></button>
+    </div>
+    <div class="panels">
+      <section class="panel">
+        <div class="panel-h"><h2>Neue Anfragen</h2><button type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'>Alle ansehen</button></div>
+        ${neue.length ? `<ul class="list">${neue.map((a) => `<li><div class="grow" data-open="anfragen" data-id="${a.id}"><b>${esc(a.firma || a.name)}</b><small>${esc(a.paket || "Allgemeine Anfrage")} · ${dAgo(a.erstellt_am)}</small></div>${a.summe_einmalig ? `<span class="num">${eur(a.summe_einmalig)}</span>` : ""}</li>`).join("")}</ul>` : emptyBox("Alles beantwortet", "Keine neuen Anfragen.")}
+      </section>
+      <section class="panel">
+        <div class="panel-h"><h2>Meine nächsten Aufgaben</h2><button type="button" data-new="aufgaben">+ Aufgabe</button></div>
+        ${tasks.length ? `<ul class="list">${tasks.map(taskLi).join("")}</ul>` : emptyBox("Keine offenen Aufgaben", "Leg mit „+ Aufgabe“ eine neue an.")}
+      </section>
+    </div>`;
+  }
+
+  function vAnfragen() {
+    const cnt = (s) => S.anfragen.filter((a) => s === "alle" || (s === "offen" ? ["neu", "in_kontakt", "angebot"].includes(a.status) : a.status === s)).length;
+    const f = UI.anfragenFilter;
+    const rows = S.anfragen.filter((a) => f === "alle" || (f === "offen" ? ["neu", "in_kontakt", "angebot"].includes(a.status) : a.status === f));
+    return head("Anfragen", "Alles, was über die Website oder manuell reinkommt.", `<button class="btn btn-sun" type="button" data-new="anfragen">+ Anfrage erfassen</button>`) +
+    `<div class="filters">${chips("anfragenFilter", [["offen", "Offen", cnt("offen")], ["neu", "Neu", cnt("neu")], ["in_kontakt", "In Kontakt", cnt("in_kontakt")], ["angebot", "Angebot", cnt("angebot")], ["gewonnen", "Gewonnen", cnt("gewonnen")], ["verloren", "Verloren", cnt("verloren")], ["alle", "Alle", cnt("alle")]], f)}</div>
+    <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Eingang</th><th>Kontakt</th><th>Paket</th><th class="num">Wert</th><th>Status</th><th>Wer</th></tr></thead><tbody>
+      ${rows.map((a) => `<tr data-open="anfragen" data-id="${a.id}"><td class="nowrap">${dAgo(a.erstellt_am)}<small>${esc(LABEL[a.quelle] || a.quelle)}</small></td><td><b>${esc(a.firma || a.name)}</b><small>${esc(a.firma ? a.name : (a.email || a.telefon || ""))}</small></td><td>${esc(a.paket || "–")}${a.rabatt ? `<small>Gründerrabatt gewünscht</small>` : ""}</td><td class="num">${a.summe_einmalig ? eur(a.summe_einmalig) : "–"}${a.summe_monatlich ? `<small>+ ${eur(a.summe_monatlich)} / Monat</small>` : ""}</td><td>${badge(a.status)}</td><td>${who(a.zustaendig)}</td></tr>`).join("")}
+    </tbody></table>` : emptyBox("Keine Anfragen in dieser Ansicht", "Sobald jemand über die Website anfragt, erscheint es hier.")}</div>`;
+  }
+
+  function vKunden() {
+    const q = UI.kundenSuche.toLowerCase();
+    const rows = S.kunden.filter((k) => !q || [k.firma, k.ansprechpartner, k.email, k.branche].some((v) => (v || "").toLowerCase().includes(q)));
+    return head("Kunden", S.kunden.length + (S.kunden.length === 1 ? " Kunde" : " Kunden"), `<button class="btn btn-sun" type="button" data-new="kunden">+ Kunde</button>`) +
+    `<div class="filters"><input class="search" type="search" id="kunden-suche" placeholder="Suchen nach Firma, Name, Branche …" value="${esc(UI.kundenSuche)}" aria-label="Kunden suchen"></div>
+    <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Firma</th><th>Kontakt</th><th>Branche</th><th class="num">Aufträge</th><th class="num">Umsatz</th><th>Wer</th></tr></thead><tbody>
+      ${rows.map((k) => { const au = S.auftraege.filter((a) => a.kunde_id === k.id && a.status !== "storniert"); const sum = au.filter((a) => a.art === "einmalig").reduce((s, a) => s + Number(a.betrag), 0); const mon = au.filter((a) => a.art === "monatlich" && a.status !== "fertig").reduce((s, a) => s + Number(a.betrag), 0);
+        return `<tr data-open="kunden" data-id="${k.id}"><td><b>${esc(k.firma)}</b><small>seit ${dDate(k.erstellt_am)}</small></td><td>${esc(k.ansprechpartner || "–")}<small>${esc(k.email || k.telefon || "")}</small></td><td>${esc(k.branche || "–")}</td><td class="num">${au.length}</td><td class="num">${eur(sum)}${mon ? `<small>+ ${eur(mon)} / Monat</small>` : ""}</td><td>${who(k.zustaendig)}</td></tr>`; }).join("")}
+    </tbody></table>` : emptyBox(q ? "Nichts gefunden" : "Noch keine Kunden", q ? "Versuch einen anderen Suchbegriff." : "Übernimm eine Anfrage als Kunden oder leg einen neuen an.")}</div>`;
+  }
+
+  function vAuftraege() {
+    const f = UI.auftraegeFilter;
+    const test = { aktiv: (a) => ["geplant", "in_arbeit"].includes(a.status), fertig: (a) => a.status === "fertig", unbezahlt: (a) => a.status === "fertig" && a.rechnung !== "bezahlt", abos: (a) => a.art === "monatlich" && a.status !== "storniert", alle: () => true };
+    const rows = S.auftraege.filter(test[f] || test.alle);
+    const n = (k) => S.auftraege.filter(test[k]).length;
+    return head("Aufträge", "Pakete, Zusatzleistungen und Abos deiner Kunden.", `<button class="btn btn-sun" type="button" data-new="auftraege">+ Auftrag</button>`) +
+    `<div class="filters">${chips("auftraegeFilter", [["aktiv", "Offen", n("aktiv")], ["fertig", "Fertig", n("fertig")], ["unbezahlt", "Nicht bezahlt", n("unbezahlt")], ["abos", "Abos", n("abos")], ["alle", "Alle", n("alle")]], f)}</div>
+    <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Auftrag</th><th>Kunde</th><th class="num">Betrag</th><th>Status</th><th>Rechnung</th><th>Abgabe</th><th>Wer</th></tr></thead><tbody>
+      ${rows.map((a) => `<tr data-open="auftraege" data-id="${a.id}"><td><b>${esc(a.titel)}</b><small>${LABEL[a.art]}</small></td><td>${esc(kName(a.kunde_id))}</td><td class="num">${eur(a.betrag)}${a.art === "monatlich" ? "<small>pro Monat</small>" : ""}</td><td>${badge(a.status)}</td><td>${badge(a.rechnung)}</td><td class="nowrap ${a.abgabe_am && a.abgabe_am < today() && ["geplant", "in_arbeit"].includes(a.status) ? "overdue" : ""}">${dDate(a.abgabe_am)}</td><td>${who(a.zustaendig)}</td></tr>`).join("")}
+    </tbody></table>` : emptyBox("Keine Aufträge in dieser Ansicht", "Aufträge entstehen, wenn du eine Anfrage als Kunden übernimmst, oder über „+ Auftrag“.")}</div>`;
+  }
+
+  function taskLi(t) {
+    const late = !t.erledigt && t.faellig_am && t.faellig_am < today();
+    const meta = [t.kunde_id ? esc(kName(t.kunde_id)) : "", t.faellig_am ? `<span class="${late ? "overdue" : ""}">${late ? "überfällig · " : "bis "}${dDate(t.faellig_am)}</span>` : ""].filter(Boolean).join(" · ");
+    return `<li class="${t.erledigt ? "done" : ""}"><input type="checkbox" data-toggle="${t.id}" ${t.erledigt ? "checked" : ""} aria-label="${esc(t.titel)} erledigt"><div class="grow" data-open="aufgaben" data-id="${t.id}"><b>${esc(t.titel)}</b>${meta ? `<small>${meta}</small>` : ""}</div>${who(t.zustaendig)}</li>`;
+  }
+
+  function vAufgaben() {
+    const names = S.team.map((t) => t.name);
+    const w = UI.aufgabenWer;
+    const rows = S.aufgaben.filter((t) => (UI.aufgabenErledigt || !t.erledigt) && (w === "alle" || (w === "meine" ? t.zustaendig === S.me : w === "offen" ? !t.zustaendig : t.zustaendig === w)))
+      .sort((a, b) => (a.erledigt - b.erledigt) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999"));
+    const opts = [["meine", "Meine"], ...names.filter((n) => n !== S.me).map((n) => [n, n]), ["offen", "Ohne Zuständigkeit"], ["alle", "Alle"]];
+    return head("Aufgaben", "Wer kümmert sich um was – mit Fristen.", `<button class="btn btn-sun" type="button" data-new="aufgaben">+ Aufgabe</button>`) +
+    `<div class="filters">${chips("aufgabenWer", opts, w)}<label class="chk" style="margin-left:8px"><input type="checkbox" id="show-done" ${UI.aufgabenErledigt ? "checked" : ""}> Erledigte zeigen</label></div>
+    <div class="task-card">${rows.length ? `<ul class="list">${rows.map(taskLi).join("")}</ul>` : emptyBox("Keine Aufgaben", "Hier ist gerade nichts zu tun.")}</div>`;
+  }
+
+  // ---------- Formulare ----------
+  const teamOpts = () => [["", "– niemand –"], ...S.team.map((t) => [t.name, t.name])];
+  const kundenOpts = (req) => [...(req ? [] : [["", "– kein Kunde –"]]), ...S.kunden.map((k) => [k.id, k.firma])];
+  const sel = (arr) => arr.map((v) => [v, LABEL[v]]);
+  const FORMS = {
+    anfragen: { titel: "Anfrage", fields: () => [
+      ["name", "Name *", "text", { req: true }], ["firma", "Firma", "text"], ["email", "E-Mail", "email"], ["telefon", "Telefon", "tel"],
+      ["paket", "Paket / Thema", "text"], ["status", "Status", "select", { opts: sel(["neu", "in_kontakt", "angebot", "gewonnen", "verloren"]) }],
+      ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["summe_einmalig", "Wert einmalig (€)", "number"],
+      ["nachricht", "Nachricht des Kunden", "textarea", { full: true }], ["notiz", "Interne Notiz", "textarea", { full: true }]] },
+    kunden: { titel: "Kunde", fields: () => [
+      ["firma", "Firma *", "text", { req: true }], ["ansprechpartner", "Ansprechpartner", "text"], ["email", "E-Mail", "email"], ["telefon", "Telefon", "tel"],
+      ["branche", "Branche", "text"], ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["adresse", "Adresse", "textarea", { full: true }], ["notizen", "Notizen", "textarea", { full: true }]] },
+    auftraege: { titel: "Auftrag", fields: () => [
+      ["titel", "Titel *", "text", { req: true, full: true }], ["kunde_id", "Kunde *", "select", { opts: kundenOpts(true), req: true }], ["betrag", "Betrag (€, inkl. MwSt.)", "number"],
+      ["art", "Abrechnung", "select", { opts: sel(["einmalig", "monatlich"]) }], ["status", "Status", "select", { opts: sel(["geplant", "in_arbeit", "fertig", "storniert"]) }],
+      ["rechnung", "Rechnung", "select", { opts: sel(["offen", "gestellt", "bezahlt"]) }], ["abgabe_am", "Abgabe bis", "date"],
+      ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["notiz", "Notiz", "textarea", { full: true }]] },
+    aufgaben: { titel: "Aufgabe", fields: () => [
+      ["titel", "Was ist zu tun? *", "text", { req: true, full: true }], ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["faellig_am", "Fällig am", "date"],
+      ["kunde_id", "Kunde", "select", { opts: kundenOpts(false) }], ["erledigt", "Erledigt", "checkbox"], ["notiz", "Notiz", "textarea", { full: true }]] }
+  };
+
+  function fieldHtml([name, label, type, o = {}], rec) {
+    const v = rec[name];
+    const cls = o.full || type === "textarea" ? "f full" : "f";
+    if (type === "checkbox") return `<label class="chk"><input type="checkbox" name="${name}" ${v ? "checked" : ""}> ${label}</label>`;
+    if (type === "select") return `<label class="${cls}">${label}<select name="${name}" ${o.req ? "required" : ""}>${(o.req && !v ? `<option value="">Bitte wählen …</option>` : "") + o.opts.map(([ov, ol]) => `<option value="${esc(ov)}" ${String(v ?? "") === String(ov) ? "selected" : ""}>${esc(ol)}</option>`).join("")}</select></label>`;
+    if (type === "textarea") return `<label class="${cls}">${label}<textarea name="${name}">${esc(v)}</textarea></label>`;
+    return `<label class="${cls}">${label}<input type="${type}" name="${name}" value="${esc(v)}" ${type === "number" ? 'step="0.01" min="0" inputmode="decimal"' : ""} ${o.req ? "required" : ""}></label>`;
+  }
+
+  function readForm(form, table) {
+    const out = {};
+    FORMS[table].fields().forEach(([name, , type]) => {
+      const el = form.elements[name]; if (!el) return;
+      if (type === "checkbox") out[name] = el.checked;
+      else if (type === "number") out[name] = el.value === "" ? 0 : Number(String(el.value).replace(",", "."));
+      else out[name] = el.value.trim() === "" ? null : el.value.trim();
+    });
+    return out;
+  }
+
+  function anfrageInfo(a) {
+    const pos = Array.isArray(a.positionen) ? a.positionen : [];
+    return `<div class="info">
+      <dl>
+        <dt>Eingang</dt><dd>${dDate(a.erstellt_am)}, ${new Date(a.erstellt_am).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr · ${esc(LABEL[a.quelle] || a.quelle)}</dd>
+        ${a.email ? `<dt>E-Mail</dt><dd><a href="mailto:${esc(a.email)}">${esc(a.email)}</a></dd>` : ""}
+        ${a.telefon ? `<dt>Telefon</dt><dd><a href="tel:${esc(a.telefon.replace(/[^\d+]/g, ""))}">${esc(a.telefon)}</a></dd>` : ""}
+        ${a.rabatt ? `<dt>Rabatt</dt><dd>Möchte sich für den 30 % Gründerrabatt bewerben</dd>` : ""}
+        ${a.kunde_id ? `<dt>Kunde</dt><dd><a href="#" data-open="kunden" data-id="${a.kunde_id}">${esc(kName(a.kunde_id))}</a></dd>` : ""}
+      </dl>
+      ${pos.length ? `<div>${pos.map((p) => `<div class="pos"><span>${esc(p.name)}</span><b>${eur(p.preis)}${p.monatlich ? " / Monat" : ""}</b></div>`).join("")}</div>` : ""}
+    </div>`;
+  }
+
+  function relLists(k) {
+    const au = S.auftraege.filter((a) => a.kunde_id === k.id), ta = S.aufgaben.filter((t) => t.kunde_id === k.id);
+    return `<div class="rel"><h3>Aufträge <button class="btn btn-line btn-sm" type="button" data-new="auftraege" data-kunde="${k.id}">+ Auftrag</button></h3>
+      ${au.length ? `<ul class="list">${au.map((a) => `<li><div class="grow" data-open="auftraege" data-id="${a.id}"><b>${esc(a.titel)}</b><small>${eur(a.betrag)}${a.art === "monatlich" ? " / Monat" : ""} · ${LABEL[a.status]} · Rechnung ${LABEL[a.rechnung].toLowerCase()}</small></div></li>`).join("")}</ul>` : `<p style="color:var(--muted)">Noch keine Aufträge.</p>`}</div>
+      <div class="rel"><h3>Aufgaben <button class="btn btn-line btn-sm" type="button" data-new="aufgaben" data-kunde="${k.id}">+ Aufgabe</button></h3>
+      ${ta.length ? `<ul class="list">${ta.map(taskLi).join("")}</ul>` : `<p style="color:var(--muted)">Keine Aufgaben.</p>`}</div>`;
+  }
+
+  function openForm(table, id, preset) {
+    const rec = id ? (S[table].find((r) => r.id === id) || {}) : Object.assign(
+      { anfragen: { status: "neu", zustaendig: S.me }, kunden: { zustaendig: S.me }, auftraege: { art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me }, aufgaben: { zustaendig: S.me } }[table], preset || {});
+    const F = FORMS[table];
+    const title = id ? (table === "anfragen" ? (rec.firma || rec.name) : table === "kunden" ? rec.firma : rec.titel) : "Neue" + (table === "kunden" ? "r " : table === "auftraege" ? "r " : " ") + F.titel;
+    let extra = "";
+    if (id && table === "anfragen") extra = anfrageInfo(rec);
+    const after = id && table === "kunden" ? relLists(rec) : "";
+    const actions = [];
+    if (id && table === "anfragen" && !rec.kunde_id) actions.push(`<button class="btn btn-sun" type="button" data-convert="${id}">Als Kunde übernehmen</button>`);
+    const d = $("dlg");
+    d.innerHTML = `<form method="dialog" id="dlg-form" novalidate>
+      <div class="dlg-h"><div><h2 id="dlg-title">${esc(title)}</h2>${id ? `<p>${F.titel} · angelegt ${dDate(rec.erstellt_am)}</p>` : ""}</div><button class="x" type="button" data-close aria-label="Schließen">×</button></div>
+      ${extra}
+      <div class="fields two">${F.fields().map((f) => fieldHtml(f, rec)).join("")}</div>
+      <p class="msg-err" id="dlg-err" role="alert" hidden></p>
+      ${after}
+      <div class="dlg-foot">${id ? `<button class="btn btn-danger" type="button" data-delete>Löschen</button>` : ""}<div class="r">${actions.join("")}<button class="btn btn-line" type="button" data-close>Abbrechen</button><button class="btn" type="submit">Speichern</button></div></div>
+    </form>`;
+    d.dataset.table = table; d.dataset.id = id || "";
+    if (!d.open) d.showModal();
+  }
+
+  const dlg = $("dlg");
+  dlg.addEventListener("click", async (e) => {
+    if (e.target === dlg || e.target.closest("[data-close]")) { dlg.close(); return; }
+    const table = dlg.dataset.table, id = dlg.dataset.id;
+    if (e.target.closest("[data-delete]")) {
+      if (!confirm("Wirklich löschen? Das kann nicht rückgängig gemacht werden." + (table === "kunden" ? " Alle Aufträge und Aufgaben dieses Kunden werden ebenfalls gelöscht." : ""))) return;
+      if (await run(db.from(table).delete().eq("id", id), "Gelöscht")) dlg.close();
+      return;
+    }
+    const conv = e.target.closest("[data-convert]");
+    if (conv) { conv.disabled = true; await convert(conv.dataset.convert); conv.disabled = false; }
+  });
+  dlg.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const table = dlg.dataset.table, id = dlg.dataset.id, form = e.target, err = $("dlg-err");
+    const missing = [...form.querySelectorAll("[required]")].find((el) => !el.value.trim());
+    if (missing) { err.textContent = "Bitte fülle alle Pflichtfelder (*) aus."; err.hidden = false; missing.focus(); return; }
+    const data = readForm(form, table);
+    if (table === "anfragen" && !id) data.quelle = "manuell";
+    const btn = form.querySelector('[type="submit"]'); btn.disabled = true;
+    const ok = await run(id ? db.from(table).update(data).eq("id", id) : db.from(table).insert(data), "Gespeichert");
+    btn.disabled = false;
+    if (ok) dlg.close();
+  });
+
+  // Anfrage → Kunde + Aufträge
+  async function convert(anfrageId) {
+    const a = S.anfragen.find((x) => x.id === anfrageId); if (!a) return;
+    const zust = $("dlg-form").elements.zustaendig.value || S.me;
+    const { data: k, error } = await db.from("kunden").insert({
+      firma: a.firma || a.name, ansprechpartner: a.name, email: a.email, telefon: a.telefon, zustaendig: zust, anfrage_id: a.id,
+      notizen: a.rabatt ? "Hat sich für den Gründerrabatt beworben." : null
+    }).select().single();
+    if (error) { toast("Fehler: " + error.message, true); return; }
+    const pos = Array.isArray(a.positionen) ? a.positionen : [];
+    const jobs = pos.length ? pos.map((p) => ({ kunde_id: k.id, titel: p.name, betrag: p.preis, art: p.monatlich ? "monatlich" : "einmalig", status: "geplant", rechnung: "offen", zustaendig: zust }))
+      : a.paket ? [{ kunde_id: k.id, titel: a.paket, betrag: a.summe_einmalig || 0, art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: zust }] : [];
+    if (jobs.length) { const r = await db.from("auftraege").insert(jobs); if (r.error) toast("Kunde angelegt, aber Aufträge nicht: " + r.error.message, true); }
+    await db.from("anfragen").update({ status: "gewonnen", kunde_id: k.id, zustaendig: zust }).eq("id", a.id);
+    await loadAll(); render();
+    toast("Kunde angelegt" + (jobs.length ? " mit " + jobs.length + (jobs.length === 1 ? " Auftrag" : " Aufträgen") : ""));
+    openForm("kunden", k.id);
+  }
+
+  // ---------- Klicks in der Hauptansicht ----------
+  document.addEventListener("click", async (e) => {
+    const t = e.target;
+    const g = t.closest("[data-go]");
+    if (g) { go(g.dataset.go, g.dataset.patch ? JSON.parse(g.dataset.patch) : null); return; }
+    const fl = t.closest("[data-filter]");
+    if (fl) { UI[fl.dataset.filter] = fl.dataset.val; render(); return; }
+    const op = t.closest("[data-open]");
+    if (op && !t.closest("input")) { e.preventDefault(); openForm(op.dataset.open, op.dataset.id); return; }
+    const nw = t.closest("[data-new]");
+    if (nw) { openForm(nw.dataset.new, null, nw.dataset.kunde ? { kunde_id: nw.dataset.kunde } : null); return; }
+    if (t.closest("[data-reload]")) { try { await loadAll(); render(); toast("Aktualisiert"); } catch (er) { toast("Fehler: " + er.message, true); } }
+  });
+  document.addEventListener("change", async (e) => {
+    const t = e.target;
+    if (t.matches("[data-toggle]")) {
+      await run(db.from("aufgaben").update({ erledigt: t.checked }).eq("id", t.dataset.toggle), t.checked ? "Erledigt ✓" : "Wieder offen");
+      if (dlg.open && dlg.dataset.table === "kunden") openForm("kunden", dlg.dataset.id);
+    }
+    if (t.id === "show-done") { UI.aufgabenErledigt = t.checked; render(); }
+  });
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "kunden-suche") {
+      UI.kundenSuche = e.target.value; const pos = e.target.selectionStart; render();
+      const s = $("kunden-suche"); s.focus(); s.setSelectionRange(pos, pos);
+    }
+  });
+
+  db.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") showLogin(); });
+  start();
+})();
+</script>
+</body>
+</html>

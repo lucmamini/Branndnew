@@ -713,6 +713,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="supabase-config.js"></script>
 <script>
 (function () {
   /* ===== HIER DEINE DATEN EINTRAGEN =====
@@ -721,8 +722,26 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     email: "",     // z. B. "hallo@branndnew.de" (nötig, damit das Formular funktioniert)
     phone: "",     // z. B. "+49 221 1234567"
     website: "",   // z. B. "branndnew.de"
-    calendly: ""   // z. B. "https://calendly.com/branndnew/erstgespraech"
+    calendly: "",  // z. B. "https://calendly.com/branndnew/erstgespraech"
+
+    // Dashboard-Anbindung: wird in supabase-config.js eingetragen (gilt für Website und Dashboard)
+    supabaseUrl: (window.BN_SUPABASE || {}).url || "",
+    supabaseKey: (window.BN_SUPABASE || {}).key || ""
   };
+
+  // Anfrage direkt im Dashboard speichern. Gibt true zurück, wenn es geklappt hat.
+  const hasDb = !!(CONFIG.supabaseUrl && CONFIG.supabaseKey);
+  async function saveLead(row) {
+    if (!hasDb) return false;
+    try {
+      const r = await fetch(CONFIG.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/anfragen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: CONFIG.supabaseKey, Authorization: "Bearer " + CONFIG.supabaseKey, Prefer: "return=minimal" },
+        body: JSON.stringify(row)
+      });
+      return r.ok;
+    } catch (_) { return false; }
+  }
 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -918,7 +937,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       $(name ? "f-mail" : "f-name").focus();
       return;
     }
-    if (!CONFIG.email) {
+    if (!CONFIG.email && !hasDb) {
       out.textContent = "Das Formular ist gerade nicht erreichbar. Bitte versuch es später noch einmal.";
       return;
     }
@@ -931,8 +950,29 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       "",
       v("f-msg") || "(keine Nachricht)"
     ].join("\n");
+    const btn = e.target.querySelector('[type="submit"]');
+    btn.disabled = true;
+    out.textContent = "Wird gesendet …";
+    const isMail = contact.includes("@");
+    saveLead({
+      quelle: "kontaktformular", name, firma: v("f-firma") || null,
+      email: isMail ? contact : null, telefon: isMail ? null : contact,
+      paket: $("f-pkg").value === "Weiß ich noch nicht" ? null : $("f-pkg").value,
+      nachricht: v("f-msg") || null
+    }).then((ok) => {
+      btn.disabled = false;
+      if (ok) {
+        out.textContent = "Danke, " + name + "! Deine Anfrage ist bei uns angekommen. Wir melden uns innerhalb eines Werktags.";
+        $("form").reset();
+        return;
+      }
+      if (!CONFIG.email) { out.textContent = "Die Anfrage konnte gerade nicht gesendet werden. Bitte versuch es gleich noch einmal."; return; }
+      sendMail();
+    });
+    function sendMail() {
     window.location.href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
     out.textContent = "Danke, " + name + "! Dein E-Mail-Programm sollte sich jetzt öffnen. Schick die Nachricht dort ab, dann melden wir uns innerhalb eines Werktags. Falls sich nichts öffnet, schreib uns direkt an " + CONFIG.email + ".";
+    }
   });
 
   // Kontakt-Fenster
@@ -1118,7 +1158,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   const BAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1.2 12h-10.6z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>';
   const dlg = $("cart"), cartBtn = $("cart-btn"), countEl = $("cart-count"), toast = $("toast");
   const cartBody = $("cart-body"), cartFoot = $("cart-foot");
-  let cart = [], step = 1, toastTimer = 0, sentName = "";
+  let cart = [], step = 1, toastTimer = 0, sentName = "", sentVia = "mail";
   const draft = { name: "", firma: "", email: "", tel: "", msg: "", rabatt: false };
   try { cart = JSON.parse(localStorage.getItem("bn-anfragewagen") || "[]").filter((id) => CATALOG[id]); } catch (e) { cart = []; }
   const saveCart = () => { try { localStorage.setItem("bn-anfragewagen", JSON.stringify(cart)); } catch (e) {} };
@@ -1206,9 +1246,10 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     } else {
       cartBody.innerHTML = `<div class="done">
           <div class="check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-          <h3>Fast geschafft, ${esc(sentName)}!</h3>
+${sentVia === "db" ? `<h3>Danke, ${esc(sentName)}!</h3>
+          <p>Deine Anfrage ist bei uns angekommen. Wir melden uns innerhalb eines Werktags bei dir.</p>` : `<h3>Fast geschafft, ${esc(sentName)}!</h3>
           <p>Dein E-Mail-Programm hat sich mit deiner fertigen Anfrage geöffnet. Schick die E-Mail dort ab, dann melden wir uns innerhalb eines Werktags.</p>
-          <p>Falls sich nichts geöffnet hat, schreib uns direkt an <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>.</p>
+          <p>Falls sich nichts geöffnet hat, schreib uns direkt an <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>.</p>`}
         </div>`;
       cartFoot.innerHTML = `<button class="btn btn-sun wide" type="button" data-finish>Fertig</button>`;
     }
@@ -1250,7 +1291,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     if (!draft.name.trim()) return fail("Bitte gib deinen Namen ein.", form.elements.name);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email.trim())) return fail("Bitte gib eine gültige E-Mail-Adresse ein.", form.elements.email);
     if (!cart.length) return fail("Dein Anfragewagen ist leer.");
-    if (!CONFIG.email) return fail("Die Anfrage kann gerade nicht verschickt werden. Bitte versuch es später noch einmal.");
+    if (!CONFIG.email && !hasDb) return fail("Die Anfrage kann gerade nicht verschickt werden. Bitte versuch es später noch einmal.");
     const t = totals();
     const lines = [
       "Neue Anfrage über den Anfragewagen", "",
@@ -1271,10 +1312,28 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     ];
     const pkg = cart.find((id) => CATALOG[id].paket);
     const subject = "Anfrage: " + (pkg ? CATALOG[pkg].name : "Zusatzleistungen") + (draft.firma.trim() ? " – " + draft.firma.trim() : "");
-    window.location.href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(lines.join("\n"));
-    sentName = draft.name.trim();
-    cart = []; saveCart();
-    step = 3; updateCart(); renderCart();
+    const btn = cartFoot.querySelector('[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = "Wird gesendet …"; }
+    saveLead({
+      quelle: "anfragewagen",
+      name: draft.name.trim(), firma: draft.firma.trim() || null, email: draft.email.trim(), telefon: draft.tel.trim() || null,
+      paket: pkg ? CATALOG[pkg].name : null,
+      positionen: cart.map((id) => ({ id, name: CATALOG[id].name, preis: CATALOG[id].price, monatlich: !!CATALOG[id].monthly })),
+      summe_einmalig: t.once, summe_monatlich: t.monthly, rabatt: !!draft.rabatt,
+      nachricht: draft.msg.trim() || null
+    }).then((ok) => {
+      if (!ok) {
+        if (!CONFIG.email) {
+          if (btn) { btn.disabled = false; btn.textContent = "Anfrage abschicken"; }
+          return fail("Die Anfrage konnte gerade nicht gesendet werden. Bitte versuch es gleich noch einmal.");
+        }
+        window.location.href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(lines.join("\n"));
+      }
+      sentVia = ok ? "db" : "mail";
+      sentName = draft.name.trim();
+      cart = []; saveCart();
+      step = 3; updateCart(); renderCart();
+    });
   });
 
   document.querySelectorAll("main [data-add]").forEach((b) => b.addEventListener("click", () => addToCart(b.dataset.add)));
