@@ -127,6 +127,7 @@ html { scroll-padding-top: 76px; }
 [data-kinetic] .kw { display: inline-block; white-space: nowrap; }
 [data-kinetic] .k { display: inline-block; transition: transform .35s cubic-bezier(.2, .7, .2, 1), color .35s ease; }
 .js-motion [data-kinetic] .kw { animation: wordIn .9s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i) * 70ms + 100ms); }
+.kin-done [data-kinetic] .kw { animation: none; opacity: 1; transform: none; filter: none; }
 @keyframes wordIn { from { opacity: 0; transform: translateY(.45em) rotate(2deg); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 
 /* Laufband */
@@ -141,9 +142,66 @@ html { scroll-padding-top: 76px; }
 .rise { opacity: 0; transform: translateY(32px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); }
 .rise.in { opacity: 1; transform: none; }
 
-.hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; padding-block: 48px 88px; }
+.hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 56px; align-items: center; padding-block: 48px 96px; }
 .hero-grid > * { min-width: 0; }
-@media (max-width: 920px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; padding-block: 24px 64px; } }
+@media (max-width: 920px) { .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; padding-block: 24px 72px; } }
+
+/* Foto-Stapel im Hero */
+.stack { position: relative; aspect-ratio: 4 / 3.6; perspective: 1200px; cursor: pointer; transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0); transition: transform .8s cubic-bezier(.2, .7, .2, 1); }
+@media (max-width: 920px) { .stack { width: min(440px, 88%); margin-inline: auto; } }
+.sc { position: absolute; left: 4%; top: 14%; width: 86%; aspect-ratio: 4 / 3; margin: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, .35); border: 4px solid #FFFFFF; background: #FFFFFF;
+  transition: transform .9s cubic-bezier(.2, .7, .2, 1), opacity .6s ease, filter .6s ease; will-change: transform; }
+.sc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sc figcaption { position: absolute; left: 10px; bottom: 10px; background: rgba(20, 22, 20, .75); color: #FFFFFF; font: 600 12.5px/1 var(--body); padding: 8px 11px; border-radius: 999px; }
+.sc[data-pos="0"] { z-index: 3; transform: rotate(-4deg); }
+.sc[data-pos="1"] { z-index: 2; transform: translate(9%, -9%) rotate(4deg) scale(.93); filter: brightness(.8); }
+.sc[data-pos="2"] { z-index: 1; transform: translate(16%, -17%) rotate(10deg) scale(.86); filter: brightness(.6); }
+.sc.leave { z-index: 4; transform: translate(-30%, 18%) rotate(-16deg) scale(.95); opacity: 0; }
+.stack:hover .sc[data-pos="1"] { transform: translate(14%, -12%) rotate(7deg) scale(.93); }
+.stack:hover .sc[data-pos="2"] { transform: translate(24%, -22%) rotate(14deg) scale(.86); }
+.js-motion .stack { animation: floaty 7s ease-in-out infinite; }
+@keyframes floaty { 50% { translate: 0 -10px; } }
+
+/* Wechselndes Wort */
+.rot { display: inline-block; position: relative; color: var(--sun); font-weight: 600; transition: opacity .35s ease, transform .35s cubic-bezier(.2, .7, .2, 1), filter .35s ease; }
+.rot.swap { opacity: 0; transform: translateY(-.6em); filter: blur(4px); }
+
+/* Großes Schriftband */
+.mega { overflow: hidden; padding-block: 8px 72px; display: grid; gap: 4px; }
+.mega-row { display: flex; width: max-content; white-space: nowrap; font: 700 clamp(56px, 10vw, 140px)/1.02 var(--display); letter-spacing: -0.03em; will-change: transform; }
+.mega-row span { padding-right: .35em; }
+.mega-row span:nth-child(odd) { color: transparent; -webkit-text-stroke: 2px var(--fg); }
+.mega-row span:nth-child(even) { color: var(--fg); }
+.mega-row span.hl { color: var(--accent-ink); -webkit-text-stroke: 0; }
+
+/* Überschriften bauen sich Wort für Wort auf */
+.hw { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .08em; margin-bottom: -.08em; }
+.hw > i { display: inline-block; font-style: normal; transition: transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--d) * 55ms + 120ms); }
+.rise .hw > i { transform: translateY(110%); }
+.rise.in .hw > i { transform: none; }
+
+/* Lichtkegel, der der Maus folgt */
+.glow { position: relative; isolation: isolate; }
+.glow::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1; opacity: 0; transition: opacity .3s ease;
+  background: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%), rgba(168, 197, 160, .35), transparent 60%); }
+.glow:hover::after { opacity: 1; }
+
+/* Beispiele: Auto-Wechsel mit Fortschritt, Bilder mit Wisch-Effekt und Parallax */
+.kit-tab { position: relative; overflow: hidden; }
+.kit-tab .bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--sun); transform: scaleX(0); transform-origin: left; }
+.kit-tab[aria-selected="true"] .bar.run { animation: tabbar 7s linear forwards; }
+.kit-paused .kit-tab .bar.run { animation-play-state: paused; }
+@keyframes tabbar { to { transform: scaleX(1); } }
+.shot img { transform: translateY(var(--py, 0px)) scale(1.12); will-change: transform; }
+.js-motion .kit.anim .shot { animation: wipe 1s cubic-bezier(.7, 0, .2, 1) both; }
+.js-motion .kit.anim .shot.side { animation-delay: .12s; }
+.js-motion .kit.anim .tile { animation: tileIn .8s cubic-bezier(.2, .7, .2, 1) .2s both; }
+@keyframes wipe { from { clip-path: inset(0 100% 0 0 round var(--r)); } to { clip-path: inset(0 0 0 0 round var(--r)); } }
+@keyframes tileIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+
+/* Laufband wird per Script bewegt (reagiert auf Scroll-Tempo) */
+.ticker.js .ticker-track { animation: none; }
+
 .badge { display: inline-block; background: var(--sun); color: var(--navy); font: 600 14px/1 var(--body); padding: 8px 14px; border-radius: 999px; }
 .hero h1 { font-size: clamp(42px, 6.4vw, 78px); margin-top: 22px; position: relative; }
 .hero h1 .dot { display: inline-block; width: .62em; height: .62em; border-radius: 50%; background: var(--sky); vertical-align: .05em; margin-left: .12em; }
@@ -151,21 +209,6 @@ html { scroll-padding-top: 76px; }
 .hero .lead strong { color: var(--hero-fg); font-weight: 600; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .hero-note { margin-top: 18px; font-size: 14px; color: var(--hero-muted); }
-
-/* Live preview */
-.studio { background: #162D20; border: 1px solid #34573F; border-radius: 22px; padding: 22px; display: grid; gap: 18px; }
-.studio label, .studio .lbl { display: block; font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--hero-muted); }
-.studio input { width: 100%; margin-top: 10px; font: 600 18px/1.2 var(--body); color: var(--hero-fg); background: #264532; border: 1px solid #3F6A4D; border-radius: 12px; padding: 14px 16px; }
-.studio input::placeholder { color: #8FA897; }
-.swatches { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-.swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid transparent; cursor: pointer; padding: 0; position: relative; overflow: hidden; }
-.swatch span { position: absolute; inset: 50% 0 0; }
-.swatch[aria-pressed="true"] { border-color: var(--hero-fg); }
-.card { aspect-ratio: 85 / 55; max-width: 100%; border-radius: 14px; padding: 7% 8%; display: flex; flex-direction: column; justify-content: space-between; transition: background .25s ease, color .25s ease; box-shadow: 0 20px 40px rgba(0,0,0,.25); }
-.card .mono { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font: 700 20px/1 var(--display); letter-spacing: -0.04em; }
-.card .name { font: 700 clamp(22px, 3vw, 30px)/1.05 var(--display); letter-spacing: -0.02em; overflow-wrap: anywhere; }
-.card .tag { font: 500 14px/1.3 var(--display); opacity: .8; margin-top: 6px; }
-.studio small { color: #9DB39F; font-size: 13px; }
 
 /* Sections */
 section { padding-block: 96px; }
@@ -185,8 +228,6 @@ section { padding-block: 96px; }
 .pkg { transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .3s ease, border-color .3s ease; }
 .pkg:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(31, 61, 43, .14); border-color: var(--accent-ink); }
 .pkg.rise { transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); }
-.studio { perspective: 900px; }
-.studio .card { transform: rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)); transition: background .25s ease, color .25s ease, transform .4s cubic-bezier(.2, .7, .2, 1); }
 .pkg-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pill { background: var(--sun); color: var(--navy); font: 600 13px/1 var(--body); padding: 6px 11px; border-radius: 999px; }
 .price { font: 700 44px/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
@@ -288,88 +329,21 @@ html.lock { overflow: hidden; }
 .kit-tab { font: 600 15px/1 var(--body); padding: 12px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; transition: background .15s ease; }
 .kit-tab:hover { border-color: var(--accent-ink); }
 .kit-tab[aria-selected="true"] { background: var(--chip-bg); color: var(--chip-fg); border-color: var(--chip-bg); }
-.kit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: "scene scene scene" "web web palette" "logos logos logos"; gap: 20px; }
-@media (max-width: 920px) { .kit { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "web" "palette" "logos"; } }
-.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
-.tile.fill { grid-template-rows: auto 1fr; align-content: stretch; }
-.tile.fill .mock-web { display: flex; flex-direction: column; }
-.tile.fill .mock-hero { flex: 1; }
-.tile.fill .logo-row { align-items: stretch; }
+.kit { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.shot { position: relative; margin: 0; border-radius: var(--r); overflow: hidden; background: var(--line); }
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.shot.main { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+.shot.side { aspect-ratio: 4 / 3; }
+.shot figcaption { position: absolute; left: 14px; bottom: 14px; background: rgba(20, 22, 20, .72); color: #FFFFFF; font: 600 13px/1 var(--body); padding: 9px 12px; border-radius: 999px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 18px; align-content: start; }
 .tile-label { font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.lockup { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.lockup b { font-weight: 700; font-size: 17px; line-height: 1.1; letter-spacing: -0.01em; }
-.lockup svg, .mock-card svg, .mp-top svg { flex: none; display: block; }
-
-.mock-web { border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,.08); transition: background .25s ease; }
-.mock-bar { display: flex; gap: 6px; align-items: center; padding: 10px 12px; background: #E3E8EF; }
-.mock-bar i { width: 9px; height: 9px; border-radius: 50%; background: #C2CBD7; }
-.mock-bar span { flex: 1; height: 16px; margin-left: 8px; border-radius: 999px; background: #FFFFFF; max-width: 240px; }
-.mock-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 22px; }
-.mock-nav .lockup { justify-content: flex-start; }
-.mock-nav .lockup b { font-size: 15px; }
-.mock-links { display: flex; gap: 18px; font-size: 13px; font-weight: 600; opacity: .75; }
-.mock-hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; align-items: center; padding: 24px 22px 34px; }
-.mh { font-weight: 700; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
-.mock-hero p { font-size: 14.5px; opacity: .8; margin: 12px 0 20px; max-width: 40ch; }
-.mock-btn, .mp-cta { display: inline-block; font: 600 14px/1 var(--body); padding: 11px 16px; border-radius: 999px; }
-.mock-art { aspect-ratio: 1; border-radius: 16px; display: grid; place-items: center; }
-.mock-art svg { width: 55%; height: auto; }
-.mock-services { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(0,0,0,.08); }
-.mock-services div { padding: 14px 22px; font-size: 13px; font-weight: 600; }
-.mock-services div + div { border-left: 1px solid rgba(0,0,0,.08); }
-@media (max-width: 560px) {
-  .mock-links, .mock-art { display: none; }
-  .mock-hero { grid-template-columns: 1fr; }
-  .mock-services { grid-template-columns: 1fr; }
-  .mock-services div + div { border-left: 0; border-top: 1px solid rgba(0,0,0,.08); }
-}
-
-/* Foto-Szene: echtes Foto als Untergrund, Drucksachen + Handy darauf. 1em = 1/20 der Objektbreite. */
-.scene { grid-area: scene; position: relative; aspect-ratio: 16 / 9; border-radius: var(--r); overflow: hidden; background: #8a8a8a center / cover no-repeat; container-type: inline-size; }
-.obj { position: absolute; left: calc(var(--x) * 1cqw); top: calc(var(--y) * 1cqw); width: calc(var(--w) * 1cqw); font-size: calc(var(--w) * 1cqw / 20); line-height: 1.3; transform: rotate(var(--rot)); background-image: linear-gradient(160deg, rgba(255,255,255,.10), rgba(0,0,0,.07)); box-shadow: 0 .6em 1.4em rgba(0,0,0,.30), 0 .12em .3em rgba(0,0,0,.25); transition: background-color .25s ease; }
-.obj .lockup { justify-content: flex-start; gap: .5em; flex-wrap: nowrap; }
-.obj .lockup b { font-size: 1em; }
-.letter { --x: 15; --y: 8; --w: 25; --rot: -5deg; aspect-ratio: 210 / 297; padding: 1.6em 1.6em 0; display: flex; flex-direction: column; gap: 1.1em; overflow: hidden; }
-.lt-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1em; }
-.lt-addr { font-size: .42em; line-height: 1.5; text-align: right; opacity: .7; white-space: nowrap; }
-.letter i, .ph-lines i { display: block; height: .32em; border-radius: .2em; background: rgba(0,0,0,.12); }
-.lt-to, .lt-rows { display: grid; gap: .5em; }
-.lt-row { display: flex; justify-content: space-between; gap: 1em; }
-.lt-title { font-weight: 700; font-size: 1.1em; margin-top: .5em; }
-.lt-total { display: flex; justify-content: space-between; border-top: .12em solid; padding-top: .5em; font-size: .55em; }
-.lt-foot { margin: auto -1.6em 0; height: .55em; }
-.card-front, .card-back { aspect-ratio: 85 / 55; border-radius: .45em; }
-.card-back { --x: 41; --y: 28; --w: 27; --rot: -3deg; display: grid; place-items: center; }
-.card-back .lockup { flex-direction: column; gap: .5em; }
-.card-back .lockup b { font-size: 1.25em; }
-.card-front { --x: 44; --y: 10; --w: 27; --rot: 5deg; padding: 1.5em 1.7em; display: flex; flex-direction: column; justify-content: space-between; }
-.cf-name { font-weight: 700; font-size: 1.45em; line-height: 1.1; }
-.cf-tag { font-size: .75em; opacity: .85; margin-top: .25em; }
-.cf-contact { font-size: .55em; opacity: .7; line-height: 1.5; }
-.phone { --x: 74; --y: 10; --w: 14; --rot: 7deg; aspect-ratio: 9 / 19.5; background-color: #15171C; border-radius: 2.8em; padding: .6em; box-shadow: 0 1em 2.2em rgba(0,0,0,.40), 0 .2em .4em rgba(0,0,0,.3); }
-.ph-screen { position: relative; height: 100%; border-radius: 2.3em; background: #FFFFFF; color: #111111; overflow: hidden; display: flex; flex-direction: column; padding-top: 2.6em; }
-.ph-notch { position: absolute; top: .8em; left: 50%; transform: translateX(-50%); width: 5.5em; height: 1.4em; border-radius: 1em; background: #15171C; }
-.ph-head { display: flex; align-items: center; gap: .6em; padding: .7em 1em; font-size: .9em; }
-.ph-av { width: 2.2em; height: 2.2em; border-radius: 50%; display: grid; place-items: center; flex: none; }
-.ph-post { aspect-ratio: 1; padding: 1.6em; display: flex; flex-direction: column; justify-content: space-between; }
-.ph-h { font-weight: 700; font-size: 2em; line-height: 1.08; }
-.ph-cta { align-self: flex-start; font: 600 .85em/1 var(--body); padding: .7em 1em; border-radius: 2em; }
-.ph-actions { display: flex; gap: .9em; padding: .9em 1em .5em; }
-.ph-actions svg { width: 1.5em; height: 1.5em; fill: none; stroke: #111111; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.ph-cap { font-size: .8em; padding: 0 1.25em; line-height: 1.5; }
-.ph-lines { padding: .8em 1.2em; display: grid; gap: .45em; }
-.ph-lines i { height: .45em; background: #E6E6E6; }
-@media (max-width: 640px) {
-  .scene { aspect-ratio: 4 / 5; }
-  .letter { display: none; }
-  .card-front { --x: 5; --y: 8; --w: 58; --rot: -5deg; }
-  .card-back { --x: 8; --y: 52; --w: 58; --rot: 4deg; }
-  .phone { --x: 60; --y: 30; --w: 33; --rot: 7deg; }
-}
-
-.logo-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 560px) { .logo-row { grid-template-columns: 1fr; } }
-.logo-v { min-height: 128px; border-radius: 12px; display: grid; place-items: center; padding: 16px; text-align: center; border: 1px solid rgba(0,0,0,.06); }
+.kit-head h3 { font-size: 24px; }
+.kit-head p { color: var(--muted); margin-top: 4px; }
+.kit-style { display: inline-block; margin-top: 10px; font: 600 12.5px/1 var(--body); padding: 6px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.kit-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15px; }
+.kit-items li { display: flex; gap: 10px; align-items: baseline; }
+.kit-items li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sky); flex: none; transform: translateY(-2px); }
+@media (max-width: 860px) { .kit { grid-template-columns: minmax(0, 1fr); } }
 .pal { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .pal li { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; font-size: 15px; }
 .pal i { width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(0,0,0,.08); }
@@ -488,32 +462,19 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <div>
         <span class="badge">Neu · 30 % Gründerrabatt für die ersten 3 Kunden</span>
         <h1 data-kinetic>Deine Firma verdient einen Auftritt, der auffällt<span class="dot" aria-hidden="true"></span></h1>
-        <p class="lead">Logo, Farben, Vorlagen und Website aus einer Hand. Für Handwerker, Dienstleister und Läden. <strong>Fertig in wenigen Tagen, ab 690 €.</strong></p>
+        <p class="lead">Logo, Farben, Vorlagen und Website aus einer Hand. Für <span class="rot" id="rot">Handwerker</span>, Dienstleister und Läden. <strong>Fertig in wenigen Tagen, ab 690 €.</strong></p>
         <div class="hero-actions">
           <a class="btn btn-sun" href="#kontakt">Kostenloses Erstgespräch</a>
           <a class="btn btn-ghost" href="#pakete">Pakete ansehen</a>
         </div>
         <p class="hero-note">Schneller und günstiger als bei klassischen Agenturen.</p>
       </div>
-
-      <div class="studio" aria-label="Live-Vorschau deiner Visitenkarte">
-        <div>
-          <label for="biz">Dein Firmenname</label>
-          <input id="biz" type="text" maxlength="28" value="Malerbetrieb Kaya" placeholder="z. B. Bäckerei Sonnenschein" autocomplete="organization">
-        </div>
-        <div>
-          <span class="lbl" id="pal-label">Farbwelt</span>
-          <div class="swatches" role="group" aria-labelledby="pal-label" id="swatches"></div>
-        </div>
-        <div class="card" id="card">
-          <div class="mono" id="mono">MK</div>
-          <div>
-            <div class="name" id="cname">Malerbetrieb Kaya</div>
-            <div class="tag" id="ctag">Farbe, die bleibt.</div>
-          </div>
-        </div>
-        <small>Probier's aus: So schnell entsteht eine erste Richtung. Das echte Brandkit gestalten wir zusammen.</small>
+      <div class="stack" id="stack" role="button" tabindex="0" aria-label="Beispiel-Brandkits ansehen">
+        <figure class="sc" data-pos="0" data-k="0"><img src="img/kessler-2.jpg" alt="" width="800" height="600"><figcaption>Röstwerk Kessler · Kaffeerösterei</figcaption></figure>
+        <figure class="sc" data-pos="1" data-k="1"><img src="img/nordlicht-2.jpg" alt="" width="800" height="600"><figcaption>Nordlicht · Physiotherapie</figcaption></figure>
+        <figure class="sc" data-pos="2" data-k="2"><img src="img/kraft-2.jpg" alt="" width="800" height="600"><figcaption>Dachbau Kraft · Dachdecker</figcaption></figure>
       </div>
+
     </div>
   </div>
 </div>
@@ -540,12 +501,17 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     </div>
   </section>
 
+  <div class="mega" aria-hidden="true">
+    <div class="mega-row" data-dir="-1"><span>Logo</span><span>Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span>Website</span><span>Logo</span><span>Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span>Website</span></div>
+    <div class="mega-row" data-dir="1"><span>Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span>Fahrzeug</span><span>Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span>Fahrzeug</span></div>
+  </div>
+
   <section id="beispiele" style="padding-top:0">
     <div class="wrap">
       <div class="sec-head">
         <span class="eyebrow">Beispiele</span>
         <h2>So sieht ein Brandkit bei uns aus.</h2>
-        <p class="lead">Vier Musterfirmen, vier Auftritte. Wähl eine Branche und sieh dir an, wie Visitenkarte, Briefpapier, Social Media und Website zusammenpassen.</p>
+        <p class="lead">Drei Musterfirmen, drei komplett verschiedene Auftritte. Wähl eine Branche und sieh dir an, wie Logo, Drucksachen und Beschilderung im echten Einsatz wirken.</p>
       </div>
       <div class="kit-tabs" role="tablist" aria-label="Musterfirmen" id="kit-tabs"></div>
       <div class="kit" id="kit" role="tabpanel"></div>
@@ -560,7 +526,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
         <h2>Such dir aus, wie weit du gehen willst.</h2>
       </div>
       <div class="packages">
-        <article class="pkg">
+        <article class="pkg glow">
           <div class="pkg-top"><h3>Start</h3></div>
           <div class="price">690 €</div>
           <ul>
@@ -571,7 +537,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
           </ul>
           <button class="btn" type="button" data-add="start" data-label="In den Anfragewagen" data-added="✓ Im Anfragewagen">In den Anfragewagen</button>
         </article>
-        <article class="pkg featured">
+        <article class="pkg glow featured">
           <div class="pkg-top"><h3>Business</h3><span class="pill">Beliebt</span></div>
           <div class="price">1.390 €</div>
           <ul>
@@ -583,7 +549,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
           </ul>
           <button class="btn" type="button" data-add="business" data-label="In den Anfragewagen" data-added="✓ Im Anfragewagen">In den Anfragewagen</button>
         </article>
-        <article class="pkg">
+        <article class="pkg glow">
           <div class="pkg-top"><h3>Komplett</h3></div>
           <div class="price">2.490 €</div>
           <ul>
@@ -747,155 +713,59 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
   if (!reduce) document.documentElement.classList.add("js-motion");
 
-  const palettes = [
-    { bg: "#1F3D2B", fg: "#FFFFFF", mono: "#F2E863", monoFg: "#1F3D2B", label: "Tannengrün & Zitrone" },
-    { bg: "#FFFFFF", fg: "#1F3D2B", mono: "#A8C5A0", monoFg: "#1F3D2B", label: "Weiß & Salbei" },
-    { bg: "#1F4D3A", fg: "#F3EFE4", mono: "#E8B04B", monoFg: "#1F4D3A", label: "Waldgrün & Ocker" },
-    { bg: "#7A2E2E", fg: "#FFF4EC", mono: "#FFF4EC", monoFg: "#7A2E2E", label: "Ziegelrot & Creme" },
-    { bg: "#F4E9D8", fg: "#2B2B2B", mono: "#2B2B2B", monoFg: "#F4E9D8", label: "Sand & Anthrazit" }
-  ];
-  const taglines = ["Farbe, die bleibt.", "Gut gemacht. Von hier.", "Mit Herz und Handwerk.", "Verlässlich seit heute.", "Einfach gut."];
   const $ = (id) => document.getElementById(id);
-  const input = $("biz"), card = $("card"), mono = $("mono"), cname = $("cname"), ctag = $("ctag"), sw = $("swatches");
-  let current = 0;
-
-  palettes.forEach((p, i) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "swatch"; b.style.background = p.bg;
-    b.setAttribute("aria-label", p.label);
-    b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-    const half = document.createElement("span"); half.style.background = p.mono; b.appendChild(half);
-    b.addEventListener("click", () => { current = i; render(); sw.querySelectorAll(".swatch").forEach((s, j) => s.setAttribute("aria-pressed", j === i ? "true" : "false")); });
-    sw.appendChild(b);
-  });
-
-  function initials(name) {
-    const words = name.trim().split(/\s+/).filter(Boolean);
-    if (!words.length) return "nn";
-    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-  }
-  function render() {
-    const p = palettes[current];
-    const name = input.value.trim() || "Deine Firma";
-    card.style.background = p.bg; card.style.color = p.fg;
-    card.style.border = p.bg === "#FFFFFF" ? "1px solid #DDE3D6" : "1px solid transparent";
-    mono.style.background = p.mono; mono.style.color = p.monoFg;
-    mono.textContent = initials(name);
-    cname.textContent = name;
-    ctag.textContent = taglines[current];
-  }
-  input.addEventListener("input", render);
-  render();
-
   // Beispiele: Musterfirmen
   const brands = [
-    { label: "Schreinerei", name: "Holzwerk Brandt", tagline: "Möbel nach Maß.", mark: "rings", photo: "img/holz.jpg",
-      font: "Georgia, 'Times New Roman', serif", fontName: "Georgia",
-      dark: "#3B2A20", accent: "#C8955B", light: "#F5EEE3", accentFg: "#3B2A20", colorNames: ["Nussbaum", "Eiche", "Leinen"],
-      handle: "@holzwerk.brandt", post: "Dein Esstisch. Aus einem Stück.", postCta: "Jetzt anfragen",
-      web: "Möbel, die ein Leben lang halten.", webSub: "Maßanfertigung aus heimischem Holz, geplant und gebaut in unserer Werkstatt.", cta: "Beratung vereinbaren",
-      nav: ["Möbel", "Werkstatt", "Kontakt"], services: ["Küchen", "Einbauschränke", "Tische"] },
-    { label: "Bäckerei", name: "Backstube Lindner", tagline: "Jeden Morgen frisch.", mark: "bread", photo: "img/baeckerei.jpg",
-      font: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif", fontName: "Palatino",
-      dark: "#2E1C14", accent: "#B23A2B", light: "#F7E6C4", accentFg: "#FFF8EC", colorNames: ["Kruste", "Ofenrot", "Weizen"],
-      handle: "@backstube.lindner", post: "Ab 6 Uhr: Brot aus dem Steinofen.", postCta: "Heute frisch",
-      web: "Brot wie früher. Jeden Morgen frisch.", webSub: "Sauerteig, lange Teigführung und kein Fertigmehl. Seit drei Generationen.", cta: "Sortiment ansehen",
-      nav: ["Sortiment", "Filialen", "Torten"], services: ["Brot & Brötchen", "Kuchen", "Frühstück"] },
-    { label: "Elektriker", name: "Elektro Vogt", tagline: "Strom mit Verstand.", mark: "bolt", photo: "img/elektro.jpg",
-      font: "'Space Grotesk', system-ui, sans-serif", fontName: "Space Grotesk",
-      dark: "#0F1C2E", accent: "#FFC21A", light: "#E9EEF4", accentFg: "#0F1C2E", colorNames: ["Nachtblau", "Signalgelb", "Lichtgrau"],
-      handle: "@elektro.vogt", post: "Wallbox? Machen wir in einem Tag.", postCta: "Termin sichern",
-      web: "Elektrik, auf die du dich verlassen kannst.", webSub: "Installation, Smart Home und Wallboxen. Schnell vor Ort, sauber gearbeitet.", cta: "Angebot anfordern",
-      nav: ["Leistungen", "Notdienst", "Kontakt"], services: ["Installation", "Smart Home", "Wallboxen"] },
-    { label: "Friseur", name: "Salon Mira", tagline: "Haare mit Haltung.", mark: "loops", photo: "img/salon.jpg",
-      font: "Inter, system-ui, sans-serif", fontName: "Inter",
-      dark: "#2D2A32", accent: "#E7B8B0", light: "#FAF4F1", accentFg: "#2D2A32", colorNames: ["Aubergine", "Rosé", "Puder"],
-      handle: "@salon.mira", post: "Neuer Schnitt, neues Gefühl.", postCta: "Online buchen",
-      web: "Dein Haar. Deine Zeit.", webSub: "Schnitt, Farbe und Pflege in ruhiger Atmosphäre. Termine auch samstags.", cta: "Termin buchen",
-      nav: ["Leistungen", "Preise", "Team"], services: ["Schnitt", "Farbe", "Pflege"] }
+    { label: "Kaffeerösterei", name: "Röstwerk Kessler", tagline: "Kleine Rösterei in der Altstadt", style: "Warm & handwerklich",
+      font: "Georgia, 'Times New Roman', serif", fontName: "Klassische Serif", fontNote: "edel, ruhig, mit Tradition",
+      colors: [["Terrakotta", "#B5582F"], ["Creme", "#F3EBDD"], ["Espresso", "#3B2418"]],
+      shots: [["img/kessler-1.jpg", "Verpackung, Visitenkarten & Becher"], ["img/kessler-2.jpg", "Ladenfront & Schild"]],
+      items: ["Wortmarke & Bohnen-Symbol", "Visitenkarten", "Etikett für Kaffeetüten", "Becher-Banderole", "Ladenschild & Markise"] },
+    { label: "Physiotherapie", name: "Nordlicht Physiotherapie", tagline: "Praxis für Physiotherapie", style: "Ruhig & klar",
+      font: "Inter, system-ui, sans-serif", fontName: "Moderne Sans", fontNote: "klar, freundlich, gut lesbar",
+      colors: [["Nachtblau", "#14306B"], ["Himmelblau", "#4FB3E3"], ["Eisblau", "#D6ECF8"]],
+      shots: [["img/nordlicht-1.jpg", "Briefpapier & Terminkarte"], ["img/nordlicht-2.jpg", "Empfang mit Wandlogo"]],
+      items: ["Logo mit Ring-Symbol", "Briefpapier", "Terminkarten", "Wandlogo für den Empfang", "Vorlagen für Social Media"] },
+    { label: "Dachdecker", name: "Dachbau Kraft", tagline: "Dachdeckerei & Spenglerei", style: "Kräftig & direkt",
+      font: "'Space Grotesk', 'Arial Black', sans-serif", fontName: "Fette Grotesk", fontNote: "laut, stark, fällt auf", upper: true,
+      colors: [["Anthrazit", "#2A2D31"], ["Signalorange", "#F2701F"], ["Schiefer", "#6B7076"]],
+      shots: [["img/kraft-1.jpg", "Visitenkarten, Klemmbrett & Helm"], ["img/kraft-2.jpg", "Fahrzeugbeschriftung"]],
+      items: ["Logo mit Dach-Symbol", "Visitenkarten", "Klemmbrett & Arbeitskleidung", "Fahrzeugbeschriftung", "Bauschild"] }
   ];
-  function markSvg(type, c, bg, size) {
-    const shapes = {
-      rings: `<circle cx="24" cy="24" r="19" fill="none" stroke="${c}" stroke-width="4"/><circle cx="24" cy="24" r="11" fill="none" stroke="${c}" stroke-width="4"/><circle cx="24" cy="24" r="4" fill="${c}"/>`,
-      bread: `<path d="M5 36a19 17 0 0 1 38 0v4H5z" fill="${c}"/><path d="M16 23l4 8M23 20l4 8M30 23l4 8" stroke="${bg}" stroke-width="3" stroke-linecap="round"/>`,
-      bolt: `<path d="M28 3L9 27h12l-3 18 21-26H27z" fill="${c}"/>`,
-      loops: `<circle cx="18" cy="24" r="12" fill="none" stroke="${c}" stroke-width="4"/><circle cx="30" cy="24" r="12" fill="none" stroke="${c}" stroke-width="4"/>`
-    };
-    return `<svg viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">${shapes[type]}</svg>`;
-  }
   const tabs = $("kit-tabs"), kit = $("kit");
   function renderKit(b) {
-    const lockup = (c, bg) => `<div class="lockup" style="font-family:${b.font}">${markSvg(b.mark, c, bg, 30)}<b>${b.name}</b></div>`;
-    const paper = "#FFFDF8";
-    const bar = (w) => `<i style="width:${w}%"></i>`;
-    const icons = [
-      '<path d="M12 20s-7-4.4-9.3-8.8A4.9 4.9 0 0 1 12 6.3a4.9 4.9 0 0 1 9.3 4.9C19 15.6 12 20 12 20z"/>',
-      '<path d="M20.5 12a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12z"/>',
-      '<path d="M21.5 3 2.5 10l8 3 3 8z"/><path d="M21.5 3 10.5 13"/>'
-    ].map((p) => `<svg viewBox="0 0 24 24">${p}</svg>`).join("");
+    const [main, side] = b.shots;
     kit.innerHTML = `
-      <div class="scene" style="background-image:url('${b.photo}')" role="img" aria-label="Foto-Mockup: Briefpapier, Visitenkarte und Instagram-Post von ${b.name}">
-        <div class="obj letter" aria-hidden="true" style="background-color:${paper};color:#2A2A2A">
-          <div class="lt-head"><div class="lockup" style="font-family:${b.font};color:${b.dark}">${markSvg(b.mark, b.dark, paper, "1.9em")}<b>${b.name}</b></div><div class="lt-addr">Musterstraße 12<br>12345 Musterstadt</div></div>
-          <div class="lt-to">${bar(38)}${bar(52)}${bar(30)}</div>
-          <div class="lt-title" style="font-family:${b.font};color:${b.dark}">Rechnung</div>
-          <div class="lt-rows">${[[58, 16], [44, 16], [66, 16], [36, 16]].map(([a, c]) => `<div class="lt-row">${bar(a)}${bar(c)}</div>`).join("")}</div>
-          <div class="lt-total" style="border-color:${b.accent}"><span>Gesamt</span><b>1.240,00 €</b></div>
-          <div class="lt-foot" style="background:${b.accent}"></div>
-        </div>
-        <div class="obj card-back" aria-hidden="true" style="background-color:${b.light};color:${b.dark}">
-          <div class="lockup" style="font-family:${b.font}">${markSvg(b.mark, b.dark, b.light, "3em")}<b>${b.name}</b></div>
-        </div>
-        <div class="obj card-front" aria-hidden="true" style="background-color:${b.dark};color:${b.light}">
-          ${markSvg(b.mark, b.accent, b.dark, "2.4em")}
-          <div><div class="cf-name" style="font-family:${b.font}">${b.name}</div><div class="cf-tag">${b.tagline}</div></div>
-          <div class="cf-contact">Musterstraße 12 · 12345 Musterstadt<br>Tel. 0123 456789</div>
-        </div>
-        <div class="obj phone" aria-hidden="true"><div class="ph-screen">
-          <div class="ph-notch"></div>
-          <div class="ph-head"><span class="ph-av" style="background:${b.dark}">${markSvg(b.mark, b.accent, b.dark, "1.3em")}</span><b>${b.handle.slice(1)}</b></div>
-          <div class="ph-post" style="background-color:${b.accent};color:${b.accentFg}"><div class="ph-h" style="font-family:${b.font}">${b.post}</div><span class="ph-cta" style="background:${b.dark};color:${b.light}">${b.postCta}</span></div>
-          <div class="ph-actions">${icons}</div>
-          <div class="ph-cap"><b>Gefällt 128 Mal</b><br><b>${b.handle.slice(1)}</b> ${b.tagline}</div>
-          <div class="ph-lines"><i></i><i style="width:60%"></i></div>
-        </div></div>
-      </div>
-      <div class="tile fill" style="grid-area:web"><span class="tile-label">Website</span>
-        <div class="mock-web" style="background:${b.light};color:${b.dark}">
-          <div class="mock-bar"><i></i><i></i><i></i><span></span></div>
-          <div class="mock-nav">${lockup(b.dark, b.light)}<div class="mock-links">${b.nav.map((n) => `<span>${n}</span>`).join("")}</div></div>
-          <div class="mock-hero">
-            <div><div class="mh" style="font-family:${b.font}">${b.web}</div><p>${b.webSub}</p><span class="mock-btn" style="background:${b.accent};color:${b.accentFg}">${b.cta}</span></div>
-            <div class="mock-art" style="background:${b.dark}">${markSvg(b.mark, b.accent, b.dark, 96)}</div>
-          </div>
-          <div class="mock-services">${b.services.map((s) => `<div>${s}</div>`).join("")}</div>
-        </div>
-      </div>
-      <div class="tile fill" style="grid-area:logos"><span class="tile-label">Logo in 3 Varianten</span>
-        <div class="logo-row">
-          <div class="logo-v" style="background:${b.light};color:${b.dark}">${lockup(b.dark, b.light)}</div>
-          <div class="logo-v" style="background:${b.dark};color:${b.light}">${lockup(b.accent, b.dark)}</div>
-          <div class="logo-v" style="background:${b.accent}">${markSvg(b.mark, b.accentFg, b.accent, 52)}</div>
-        </div>
-      </div>
-      <div class="tile" style="grid-area:palette;align-self:start"><span class="tile-label">Farben &amp; Schrift</span>
-        <ul class="pal">${[b.dark, b.accent, b.light].map((h, k) => `<li><i style="background:${h}"></i><b>${b.colorNames[k]}</b><code>${h}</code></li>`).join("")}</ul>
-        <div class="font-sample"><span style="font-family:${b.font}">Aa</span><div><b>${b.fontName}</b><small>Schrift für Überschriften</small></div></div>
+      <figure class="shot main"><img src="${main[0]}" alt="${b.name}: ${main[1]}" width="1600" height="900"><figcaption>${main[1]}</figcaption></figure>
+      <figure class="shot side"><img src="${side[0]}" alt="${b.name}: ${side[1]}" width="1600" height="1200" loading="lazy"><figcaption>${side[1]}</figcaption></figure>
+      <div class="tile">
+        <div class="kit-head"><h3>${b.name}</h3><p>${b.tagline}</p><span class="kit-style">Stil: ${b.style}</span></div>
+        <div><span class="tile-label">Farben</span>
+          <ul class="pal" style="margin-top:12px">${b.colors.map(([n, h]) => `<li><i style="background:${h}"></i><b>${n}</b><code>${h}</code></li>`).join("")}</ul></div>
+        <div class="font-sample"><span style="font-family:${b.font}${b.upper ? ";text-transform:uppercase" : ""}">Aa</span><div><b>${b.fontName}</b><small>${b.fontNote}</small></div></div>
+        <div><span class="tile-label">Im Brandkit</span>
+          <ul class="kit-items" style="margin-top:12px">${b.items.map((x) => `<li>${x}</li>`).join("")}</ul></div>
       </div>`;
   }
+  let kitIndex = 0, kitAuto = !reduce;
   function selectKit(i) {
     [...tabs.children].forEach((t, j) => { t.setAttribute("aria-selected", j === i ? "true" : "false"); t.tabIndex = j === i ? 0 : -1; });
     kit.setAttribute("aria-labelledby", "kt" + i);
     const had = kit.childElementCount > 0;
     renderKit(brands[i]);
-    if (had && !reduce && kit.animate) kit.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 380, easing: "cubic-bezier(.2,.7,.2,1)" });
+    kitIndex = i;
+    if (had && !reduce) { kit.classList.remove("anim"); void kit.offsetWidth; kit.classList.add("anim"); }
+    kit.querySelectorAll(".tile").forEach((t) => t.classList.add("glow"));
+    [...tabs.children].forEach((t, j) => { const b = t.querySelector(".bar"); if (b) { b.classList.remove("run"); if (j === i && kitAuto) { void b.offsetWidth; b.classList.add("run"); } } });
+    if (typeof parallaxShots === "function") parallaxShots();
   }
   brands.forEach((b, i) => {
     const t = document.createElement("button");
     t.type = "button"; t.className = "kit-tab"; t.id = "kt" + i; t.textContent = b.label;
     t.setAttribute("role", "tab"); t.setAttribute("aria-controls", "kit");
-    t.addEventListener("click", () => selectKit(i));
+    const bar = document.createElement("span"); bar.className = "bar"; bar.setAttribute("aria-hidden", "true"); t.appendChild(bar);
+    bar.addEventListener("animationend", () => { if (kitAuto) selectKit((kitIndex + 1) % brands.length); });
+    t.addEventListener("click", () => { kitAuto = false; selectKit(i); });
     t.addEventListener("keydown", (e) => {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       e.preventDefault();
@@ -1031,6 +901,8 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
 
   // Überschrift: Wörter fliegen ein, Buchstaben weichen der Maus aus
   const hero = $("top"), kin = document.querySelector("[data-kinetic]");
+  // Absicherung: falls die Einflug-Animation nicht läuft, Überschrift trotzdem zeigen
+  setTimeout(() => document.documentElement.classList.add("kin-done"), 2500);
   if (kin) {
     kin.setAttribute("aria-label", kin.textContent.trim());
     let wi = 0;
@@ -1074,21 +946,143 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     }
   }
 
-  // Lichtkugeln im Hero folgen leicht der Maus, Visitenkarte kippt mit
+  // Lichtkugeln im Hero folgen leicht der Maus
   if (canHover && !reduce) {
-    const orbs = $("orbs"), studio = document.querySelector(".studio");
-    const clamp = (v) => Math.max(-1, Math.min(1, v));
+    const orbs = $("orbs");
     hero.addEventListener("pointermove", (e) => {
       const r = hero.getBoundingClientRect();
       orbs.style.setProperty("--mx", (((e.clientX - r.left) / r.width) - 0.5) * 50 + "px");
       orbs.style.setProperty("--my", (((e.clientY - r.top) / r.height) - 0.5) * 50 + "px");
     });
-    studio.addEventListener("pointermove", (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty("--rx", clamp(((e.clientX - r.left) / r.width - 0.5) * 2) * 9 + "deg");
-      card.style.setProperty("--ry", clamp(-((e.clientY - r.top) / r.height - 0.5) * 2) * 9 + "deg");
+  }
+
+  // Wechselndes Wort im Hero
+  const rot = $("rot");
+  if (rot && !reduce) {
+    const words = ["Handwerker", "Bäckereien", "Dachdecker", "Praxen", "Cafés", "Friseure", "Elektriker", "Hofläden"];
+    let wi2 = 0;
+    setInterval(() => {
+      if (document.hidden) return;
+      rot.classList.add("swap");
+      setTimeout(() => { wi2 = (wi2 + 1) % words.length; rot.textContent = words[wi2]; rot.classList.remove("swap"); }, 350);
+    }, 2200);
+  }
+
+  // Foto-Stapel: wechselt automatisch, folgt der Maus, Klick öffnet das Beispiel
+  const stack = $("stack");
+  if (stack) {
+    const cards = [...stack.querySelectorAll(".sc")];
+    const cycle = () => {
+      const front = cards.find((c) => c.dataset.pos === "0");
+      front.classList.add("leave");
+      setTimeout(() => {
+        cards.forEach((c) => { c.dataset.pos = String((+c.dataset.pos + 2) % 3); });
+        front.classList.remove("leave");
+      }, 450);
+    };
+    const startStack = () => reduce ? 0 : setInterval(() => { if (!document.hidden) cycle(); }, 3600);
+    let stackTimer = startStack();
+    const openFront = () => {
+      const front = cards.find((c) => c.dataset.pos === "0");
+      kitAuto = false; selectKit(+front.dataset.k);
+      document.getElementById("beispiele").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    };
+    stack.addEventListener("click", openFront);
+    stack.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFront(); } });
+    if (canHover && !reduce) {
+      stack.addEventListener("pointerenter", () => { clearInterval(stackTimer); stackTimer = 0; });
+      stack.addEventListener("pointerleave", () => { if (!stackTimer) stackTimer = startStack(); });
+      hero.addEventListener("pointermove", (e) => {
+        const r = hero.getBoundingClientRect();
+        stack.style.setProperty("--sx", (((e.clientX - r.left) / r.width) - 0.5) * -24 + "px");
+        stack.style.setProperty("--sy", (((e.clientY - r.top) / r.height) - 0.5) * -18 + "px");
+      });
+    }
+  }
+
+  // Überschriften in Wörter zerlegen (bauen sich beim Einblenden auf)
+  if (!reduce) {
+    document.querySelectorAll(".sec-head h2").forEach((h) => {
+      h.setAttribute("aria-label", h.textContent.trim());
+      let d = 0;
+      h.innerHTML = h.textContent.trim().split(/\s+/).map((w) => '<span class="hw" aria-hidden="true"><i style="--d:' + (d++) + '">' + w + '</i></span>').join(" ");
     });
-    studio.addEventListener("pointerleave", () => { card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg"); });
+  }
+
+  // Lichtkegel folgt der Maus, Paketkarten kippen leicht
+  if (canHover && !reduce) {
+    document.addEventListener("pointermove", (e) => {
+      const el = e.target.closest && e.target.closest(".glow");
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--gx", e.clientX - r.left + "px");
+      el.style.setProperty("--gy", e.clientY - r.top + "px");
+      if (el.classList.contains("pkg")) {
+        const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = "translateY(-8px) perspective(900px) rotateX(" + (-y * 5).toFixed(2) + "deg) rotateY(" + (x * 6).toFixed(2) + "deg)";
+      }
+    }, { passive: true });
+    document.querySelectorAll(".pkg.glow").forEach((p) => p.addEventListener("pointerleave", () => { p.style.transform = ""; }));
+
+    // Buttons ziehen sich leicht zur Maus
+    document.querySelectorAll(".hero .btn, .nav .btn, .contact-btn").forEach((b) => {
+      b.addEventListener("pointermove", (e) => {
+        const r = b.getBoundingClientRect();
+        b.style.transform = "translate(" + ((e.clientX - r.left) / r.width - 0.5) * 10 + "px, " + (((e.clientY - r.top) / r.height - 0.5) * 8 - 2) + "px)";
+      });
+      b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+  }
+
+  // Laufband & großes Schriftband reagieren auf das Scrollen
+  const ticker = document.querySelector(".ticker"), track = ticker && ticker.querySelector(".ticker-track");
+  const megaRows = [...document.querySelectorAll(".mega-row")];
+  if (!reduce && track) {
+    ticker.classList.add("js");
+    let x = 0, lastY = scrollY, vel = 0, hover = false;
+    ticker.addEventListener("pointerenter", () => { hover = true; });
+    ticker.addEventListener("pointerleave", () => { hover = false; });
+    (function loop() {
+      const dy = scrollY - lastY; lastY = scrollY;
+      vel += (dy - vel) * 0.12;
+      const half = track.scrollWidth / 2;
+      if (!hover) x -= 0.6 + Math.min(Math.abs(vel), 60) * 0.35;
+      if (half && -x >= half) x += half;
+      track.style.transform = "translateX(" + x.toFixed(1) + "px) skewX(" + Math.max(-12, Math.min(12, -vel * 0.4)).toFixed(2) + "deg)";
+      megaRows.forEach((row) => {
+        const r = row.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > innerHeight + 200) return;
+        const p = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)));
+        const span = Math.max(0, row.scrollWidth - innerWidth);
+        const off = +row.dataset.dir > 0 ? -span * (1 - p) * 0.6 : -span * p * 0.6;
+        row.style.transform = "translateX(" + off.toFixed(1) + "px)";
+      });
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  // Beispiel-Fotos bewegen sich beim Scrollen leicht (Parallax)
+  function parallaxShots() {
+    if (reduce) return;
+    document.querySelectorAll(".shot").forEach((f) => {
+      const r = f.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const c = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      f.querySelector("img").style.setProperty("--py", (c * -40).toFixed(1) + "px");
+    });
+  }
+  addEventListener("scroll", () => requestAnimationFrame(parallaxShots), { passive: true });
+  parallaxShots();
+
+  // Auto-Wechsel der Beispiele pausiert, solange die Maus drauf ist oder der Bereich nicht sichtbar ist
+  const kitWrap = document.getElementById("beispiele");
+  if (kitWrap && "IntersectionObserver" in window) {
+    let vis = false, hov = false;
+    const upd = () => kitWrap.classList.toggle("kit-paused", !vis || hov);
+    new IntersectionObserver(([e]) => { vis = e.isIntersecting; upd(); }, { threshold: 0.25 }).observe(kitWrap);
+    kitWrap.addEventListener("pointerenter", () => { hov = true; upd(); });
+    kitWrap.addEventListener("pointerleave", () => { hov = false; upd(); });
+    upd();
   }
 
   // Inhalte blenden beim Scrollen versetzt ein
