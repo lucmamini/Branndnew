@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -168,10 +168,12 @@ html { scroll-padding-top: 76px; }
 
 /* Großes Schriftband */
 .mega { overflow: hidden; padding-block: 8px 72px; display: grid; gap: 4px; }
-.mega-row { display: flex; width: max-content; white-space: nowrap; font: 700 clamp(56px, 10vw, 140px)/1.02 var(--display); letter-spacing: -0.03em; will-change: transform; }
+.mega-row { display: flex; width: max-content; white-space: nowrap; font: 700 clamp(40px, 6.5vw, 92px)/1.05 var(--display); letter-spacing: -0.03em; will-change: transform; animation: megaMove 90s linear infinite; }
+.mega-row.rev { animation-direction: reverse; animation-duration: 110s; }
+@keyframes megaMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .mega-row span { padding-right: .35em; }
-.mega-row span:nth-child(odd) { color: transparent; -webkit-text-stroke: 2px var(--fg); }
-.mega-row span:nth-child(even) { color: var(--fg); }
+.mega-row span { color: var(--fg); }
+.mega-row span.o { color: transparent; -webkit-text-stroke: 2px var(--fg); }
 .mega-row span.hl { color: var(--accent-ink); -webkit-text-stroke: 0; }
 
 /* Überschriften bauen sich Wort für Wort auf */
@@ -501,9 +503,9 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     </div>
   </section>
 
-  <div class="mega" aria-hidden="true">
-    <div class="mega-row" data-dir="-1"><span>Logo</span><span>Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span>Website</span><span>Logo</span><span>Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span>Website</span></div>
-    <div class="mega-row" data-dir="1"><span>Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span>Fahrzeug</span><span>Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span>Fahrzeug</span></div>
+  <div class="mega" id="schriftband" aria-hidden="true">
+    <div class="mega-row"><span>Logo</span><span class="o">Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span class="o">Website</span><span>Logo</span><span class="o">Farben</span><span class="hl">Schrift</span><span>Visitenkarte</span><span class="o">Website</span></div>
+    <div class="mega-row rev"><span class="o">Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span class="o">Fahrzeug</span><span class="o">Social Media</span><span>Briefpapier</span><span class="hl">Beschilderung</span><span class="o">Fahrzeug</span></div>
   </div>
 
   <section id="beispiele" style="padding-top:0">
@@ -1036,7 +1038,6 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
 
   // Laufband & großes Schriftband reagieren auf das Scrollen
   const ticker = document.querySelector(".ticker"), track = ticker && ticker.querySelector(".ticker-track");
-  const megaRows = [...document.querySelectorAll(".mega-row")];
   if (!reduce && track) {
     ticker.classList.add("js");
     let x = 0, lastY = scrollY, vel = 0, hover = false;
@@ -1049,14 +1050,6 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       if (!hover) x -= 0.6 + Math.min(Math.abs(vel), 60) * 0.35;
       if (half && -x >= half) x += half;
       track.style.transform = "translateX(" + x.toFixed(1) + "px) skewX(" + Math.max(-12, Math.min(12, -vel * 0.4)).toFixed(2) + "deg)";
-      megaRows.forEach((row) => {
-        const r = row.getBoundingClientRect();
-        if (r.bottom < -200 || r.top > innerHeight + 200) return;
-        const p = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)));
-        const span = Math.max(0, row.scrollWidth - innerWidth);
-        const off = +row.dataset.dir > 0 ? -span * (1 - p) * 0.6 : -span * p * 0.6;
-        row.style.transform = "translateX(" + off.toFixed(1) + "px)";
-      });
       requestAnimationFrame(loop);
     })();
   }
