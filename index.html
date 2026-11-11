@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BranndNew</title>
-<meta name="description" content="BranndNew – KI-Brandkits für Handwerker, Dienstleister und Läden. Logo, Farben, Vorlagen und Website ab 690 €.">
+<meta name="description" content="BranndNew – KI-Brandkits für Handwerker, Dienstleister und Läden. Brandkit ab 690 €, Komplettpaket mit Website ab 2.490 €.">
 <meta name="theme-color" content="#1F3D2B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F3D2B'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='32' fill='%23FFFFFF'%3En%3Ctspan fill='%23F2E863'%3En%3C/tspan%3E%3C/text%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
 <meta property="og:site_name" content="BranndNew">
 <meta property="og:title" content="BranndNew – Deine Marke. Brandneu.">
-<meta property="og:description" content="Logo, Farben, Vorlagen und Website aus einer Hand. Für Handwerker, Dienstleister und Läden. Fertig in wenigen Tagen, ab 690 €.">
+<meta property="og:description" content="Logo, Farben, Vorlagen und Website aus einer Hand. Für Handwerker, Dienstleister und Läden. Fertig in wenigen Tagen, Brandkit ab 690 €.">
 <!-- Für ein Vorschaubild beim Teilen: Bild (1200×630 px) hochladen und hier die volle URL eintragen -->
 <!-- <meta property="og:image" content="https://DEINE-DOMAIN.de/og-bild.png"> -->
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -204,7 +204,7 @@ html { scroll-padding-top: 76px; }
 /* Laufband wird per Script bewegt (reagiert auf Scroll-Tempo) */
 .ticker.js .ticker-track { animation: none; }
 
-.badge { display: inline-block; background: var(--sun); color: var(--navy); font: 600 14px/1 var(--body); padding: 8px 14px; border-radius: 999px; }
+.badge { display: inline-block; background: var(--sun); color: var(--navy); font: 600 14px/1 var(--body); padding: 8px 14px; border-radius: 999px; text-decoration: none; }
 .hero h1 { font-size: clamp(42px, 6.4vw, 78px); margin-top: 22px; position: relative; }
 .hero h1 .dot { display: inline-block; width: .62em; height: .62em; border-radius: 50%; background: var(--sky); vertical-align: .05em; margin-left: .12em; }
 .hero .lead { color: var(--hero-muted); margin-top: 22px; }
@@ -446,7 +446,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m4.5 7 7.5 6 7.5-6"/></svg>
         <span>Kontakt</span>
       </button>
-      <a class="btn btn-sun" href="#kontakt" id="book">Termin buchen</a>
+      <a class="btn btn-sun" href="#kontakt" id="book">Erstgespräch anfragen</a>
       <button class="cart-btn" type="button" id="cart-btn" aria-haspopup="dialog" aria-label="Anfragewagen öffnen, 0 Positionen">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1.2 12h-10.6z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
         <span class="cart-count" id="cart-count" hidden>0</span>
@@ -462,9 +462,9 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <span class="badge">Neu · 30 % Gründerrabatt für die ersten 3 Kunden</span>
+        <a class="badge" href="#kontakt">Neu · 30 % Gründerrabatt für die ersten 3 Kunden – jetzt bewerben</a>
         <h1 data-kinetic>Deine Firma verdient einen Auftritt, der auffällt<span class="dot" aria-hidden="true"></span></h1>
-        <p class="lead">Logo, Farben, Vorlagen und Website aus einer Hand. Für <span class="rot" id="rot">Handwerker</span>, Dienstleister und Läden. <strong>Fertig in wenigen Tagen, ab 690 €.</strong></p>
+        <p class="lead">Logo, Farben, Vorlagen und Website aus einer Hand. Für <span class="rot" id="rot">Handwerker</span>, Dienstleister und Läden. <strong>Fertig in wenigen Tagen, Brandkit ab 690 €.</strong></p>
         <div class="hero-actions">
           <a class="btn btn-sun" href="#kontakt">Kostenloses Erstgespräch</a>
           <a class="btn btn-ghost" href="#pakete">Pakete ansehen</a>
@@ -472,9 +472,9 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
         <p class="hero-note">Schneller und günstiger als bei klassischen Agenturen.</p>
       </div>
       <div class="stack" id="stack" role="button" tabindex="0" aria-label="Beispiel-Brandkits ansehen">
-        <figure class="sc" data-pos="0" data-k="0"><img src="img/kessler-2.jpg" alt="" width="800" height="600"><figcaption>Röstwerk Kessler · Kaffeerösterei</figcaption></figure>
-        <figure class="sc" data-pos="1" data-k="1"><img src="img/nordlicht-2.jpg" alt="" width="800" height="600"><figcaption>Nordlicht · Physiotherapie</figcaption></figure>
-        <figure class="sc" data-pos="2" data-k="2"><img src="img/kraft-2.jpg" alt="" width="800" height="600"><figcaption>Dachbau Kraft · Dachdecker</figcaption></figure>
+        <figure class="sc" data-pos="0" data-k="0"><img src="img/kessler-2.jpg" alt="Brandkit-Beispiel Röstwerk Kessler, Kaffeerösterei" width="800" height="600"><figcaption>Röstwerk Kessler · Kaffeerösterei</figcaption></figure>
+        <figure class="sc" data-pos="1" data-k="1"><img src="img/nordlicht-2.jpg" alt="Brandkit-Beispiel Nordlicht, Physiotherapie" width="800" height="600"><figcaption>Nordlicht · Physiotherapie</figcaption></figure>
+        <figure class="sc" data-pos="2" data-k="2"><img src="img/kraft-2.jpg" alt="Brandkit-Beispiel Dachbau Kraft, Dachdecker" width="800" height="600"><figcaption>Dachbau Kraft · Dachdecker</figcaption></figure>
       </div>
 
     </div>
@@ -513,7 +513,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <div class="sec-head">
         <span class="eyebrow">Beispiele</span>
         <h2>So sieht ein Brandkit bei uns aus.</h2>
-        <p class="lead">Drei Musterfirmen, drei komplett verschiedene Auftritte. Wähl eine Branche und sieh dir an, wie Logo, Drucksachen und Beschilderung im echten Einsatz wirken.</p>
+        <p class="lead">Drei Musterfirmen, drei komplett verschiedene Auftritte. Wähle eine Branche und sieh dir an, wie Logo, Drucksachen und Beschilderung im echten Einsatz wirken.</p>
       </div>
       <div class="kit-tabs" role="tablist" aria-label="Musterfirmen" id="kit-tabs"></div>
       <div class="kit" id="kit" role="tabpanel"></div>
@@ -567,7 +567,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <div class="extras">
         <div class="extra"><div><b>Website-Wartung</b><span>39 € / Monat</span></div><button class="btn-mini" type="button" data-add="wartung" data-label="Hinzufügen" data-added="✓ Hinzugefügt">Hinzufügen</button></div>
         <div class="extra"><div><b>Social-Media-Betreuung</b><span>249 € / Monat</span></div><button class="btn-mini" type="button" data-add="social" data-label="Hinzufügen" data-added="✓ Hinzugefügt">Hinzufügen</button></div>
-        <div class="extra deal"><b>30 % Gründerrabatt</b><span>für die ersten 3 Kunden</span></div>
+        <div class="extra deal"><b>30 % Gründerrabatt</b><span>für die ersten 3 Kunden, auf Bewerbung</span></div>
       </div>
       <p class="tax-note">Alle Preise sind Festpreise.</p>
     </div>
@@ -1202,7 +1202,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
 
     if (step === 1) {
       if (!cart.length) {
-        cartBody.innerHTML = `<div class="empty">${BAG}<b>Dein Anfragewagen ist leer.</b><p>Wähl ein Paket und, wenn du magst, Zusatzleistungen aus.</p><a class="btn btn-sun" href="#pakete" data-close>Pakete ansehen</a></div>`;
+        cartBody.innerHTML = `<div class="empty">${BAG}<b>Dein Anfragewagen ist leer.</b><p>Wähle ein Paket und, wenn du magst, Zusatzleistungen aus.</p><a class="btn btn-sun" href="#pakete" data-close>Pakete ansehen</a></div>`;
         cartFoot.innerHTML = "";
         return;
       }
@@ -1212,7 +1212,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
           <div><b>${it.name}</b><small>${it.desc}</small></div>
           <div class="it-end"><span>${eur(it.price)}${it.monthly ? " / Monat" : ""}</span><button type="button" class="rm" data-rm="${id}" aria-label="${it.name} entfernen">Entfernen</button></div>
         </li>`; }).join("")}</ul>
-        ${cart.some((id) => CATALOG[id].paket) ? "" : `<p class="hint">Tipp: Wähl noch ein Paket dazu. <a href="#pakete" data-close>Zu den Paketen</a></p>`}
+        ${cart.some((id) => CATALOG[id].paket) ? "" : `<p class="hint">Tipp: Wähle noch ein Paket dazu. <a href="#pakete" data-close>Zu den Paketen</a></p>`}
         ${extras.length ? `<div class="upsell"><span class="eyebrow">Passt dazu</span>${extras.map((id) => `<div class="up"><div><b>${CATALOG[id].name}</b><small>${eur(CATALOG[id].price)} / Monat</small></div><button class="btn-mini" type="button" data-add="${id}">Hinzufügen</button></div>`).join("")}</div>` : ""}`;
       cartFoot.innerHTML = sum + `<button class="btn btn-sun wide" type="button" data-next>Weiter zur Anfrage</button>`;
     } else if (step === 2) {
