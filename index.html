@@ -928,7 +928,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       const chars = [...kin.querySelectorAll(".k")];
       let centers = [], px = -1e4, py = -1e4, raf = 0;
       const measure = () => { centers = chars.map((c) => [c.offsetLeft + c.offsetWidth / 2, c.offsetTop + c.offsetHeight / 2]); };
-      const R = 170;
+      const R = 120;
       function frame() {
         raf = 0;
         const box = kin.getBoundingClientRect();
@@ -942,7 +942,12 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       }
       measure();
       addEventListener("resize", measure);
+      addEventListener("load", measure);
       document.fonts && document.fonts.ready.then(measure);
+      document.fonts && document.fonts.addEventListener && document.fonts.addEventListener("loadingdone", measure);
+      if ("ResizeObserver" in window) new ResizeObserver(measure).observe(kin);
+      // Positionen bei jedem Betreten neu messen, damit Zeilenumbrüche nach dem Laden der Schrift stimmen
+      hero.addEventListener("pointerenter", measure);
       hero.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(frame); });
       hero.addEventListener("pointerleave", () => { px = py = -1e4; if (!raf) raf = requestAnimationFrame(frame); });
     }
