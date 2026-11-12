@@ -90,11 +90,60 @@ label.chk input { width: 18px; height: 18px; accent-color: var(--accent-ink); ma
 .side .me a, .side .me button { color: var(--side-muted); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; font-size: 14px; text-decoration: underline; }
 .side .me a:hover, .side .me button:hover { color: var(--side-fg); }
 .side nav svg { display: none; }
+.side-top { display: flex; flex-direction: column; gap: 12px; }
+.live { display: inline-flex; align-items: center; gap: 7px; margin-left: 10px; font-size: 12px; font-weight: 600; color: var(--side-muted); letter-spacing: .04em; }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: #7BD88F; box-shadow: 0 0 0 0 rgba(123, 216, 143, .6); animation: puls 2.2s ease-out infinite; }
+@keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(123, 216, 143, .6); } 70%, 100% { box-shadow: 0 0 0 8px rgba(123, 216, 143, 0); } }
+
+/* Prioritäten */
+.prio { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 4px 10px 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: transform .15s ease, background .2s ease; }
+.prio::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.prio:hover { transform: translateY(-1px); }
+.prio:active { transform: scale(.94); }
+.prio.p-hoch { background: #FDECEA; border-color: #F2B8B0; color: #9A2A1C; }
+.prio.p-hoch::before { background: #D9412E; }
+.prio.p-mittel::before { background: #D9A400; }
+.prio.p-niedrig { color: var(--muted); }
+.prio.p-niedrig::before { background: var(--sky); }
+.prio.pop { animation: pop .35s ease; }
+@keyframes pop { 40% { transform: scale(1.15); } }
+.list li { position: relative; align-items: center; }
+.list li.pl-hoch::before { content: ""; position: absolute; left: -16px; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: #D9412E; }
+.panel .list li.pl-hoch::before { left: -18px; }
+.prio-filter { margin-top: -6px; }
+.prio-filter .chip[data-val="hoch"] i { color: #C0392B; opacity: 1; }
+
+/* Bewegung: Einblenden beim Wechsel der Ansicht */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+#view.enter .head, #view.enter .kpi, #view.enter .panel, #view.enter .filters, #view.enter .tbl-wrap, #view.enter .task-card, #view.enter .cal, #view.enter .ber-card, #view.enter .stepper, #view.enter .box { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; }
+#view.enter .kpi:nth-child(2) { animation-delay: .04s; } #view.enter .kpi:nth-child(3) { animation-delay: .08s; }
+#view.enter .kpi:nth-child(4) { animation-delay: .12s; } #view.enter .kpi:nth-child(5) { animation-delay: .16s; } #view.enter .kpi:nth-child(6) { animation-delay: .2s; }
+#view.enter .panel { animation-delay: .18s; } #view.enter .panel + .panel { animation-delay: .26s; }
+#view.enter .filters { animation-delay: .06s; } #view.enter .tbl-wrap, #view.enter .task-card { animation-delay: .12s; }
+#view.enter .list li, #view.enter tbody tr { animation: rise .4s ease both; }
+#view.enter .list li:nth-child(1), #view.enter tbody tr:nth-child(1) { animation-delay: .18s; }
+#view.enter .list li:nth-child(2), #view.enter tbody tr:nth-child(2) { animation-delay: .22s; }
+#view.enter .list li:nth-child(3), #view.enter tbody tr:nth-child(3) { animation-delay: .26s; }
+#view.enter .list li:nth-child(4), #view.enter tbody tr:nth-child(4) { animation-delay: .3s; }
+#view.enter .list li:nth-child(5), #view.enter tbody tr:nth-child(5) { animation-delay: .34s; }
+#view.enter .list li:nth-child(n+6), #view.enter tbody tr:nth-child(n+6) { animation-delay: .38s; }
+.kpi, .panel { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(31, 61, 43, .1); }
+.kpi:active { transform: translateY(-1px) scale(.99); }
+.btn { transition: transform .15s ease, filter .2s ease, background .2s ease; }
+.btn:active { transform: scale(.97); }
+.chip { transition: background .2s ease, color .2s ease, border-color .2s ease; }
+/* Aufgabe abhaken */
+.list li.abhaken { animation: weg .45s ease forwards; }
+.list li.abhaken .grow b { text-decoration: line-through; color: var(--muted); }
+@keyframes weg { 0% { background: #EAF5EC; } 60% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateX(16px); background: #EAF5EC; } }
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
 /* Handy: Kopfzeile oben, Navigation als Leiste unten (wie eine App) */
 @media (max-width: 860px) {
   .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
   .side { position: sticky; top: 0; z-index: 20; height: auto; align-self: start; padding: calc(12px + env(safe-area-inset-top)) 16px 12px; gap: 0; }
   .side .wordmark small, .side .me { display: none; }
+  .side-top { flex-direction: row; justify-content: space-between; align-items: center; }
   .side nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; overflow-x: auto; gap: 0; scrollbar-width: none; background: var(--side-bg); border-top: 1px solid var(--side-line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
   .side nav::-webkit-scrollbar { display: none; }
   .side nav button { position: relative; flex: 1 0 74px; width: auto; flex-direction: column; justify-content: center; gap: 3px; padding: 6px 4px; font-size: 11px; font-weight: 600; border-radius: 10px; text-align: center; }
@@ -342,7 +391,7 @@ td.nowrap { white-space: nowrap; }
 <!-- App -->
 <div class="app" id="app" hidden>
   <aside class="side">
-    <span class="wordmark">Bran<span class="nn">n</span>dNew<small>Team-Dashboard</small></span>
+    <div class="side-top"><span class="wordmark">Bran<span class="nn">n</span>dNew<small>Team-Dashboard</small></span><span class="live" id="live" hidden title="Änderungen erscheinen sofort"><i></i>Live</span></div>
     <nav id="nav" aria-label="Bereiche">
       <button type="button" data-view="uebersicht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Übersicht</button>
       <button type="button" data-view="anfragen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>Anfragen <span class="cnt" id="cnt-anfragen" hidden></span></button>
@@ -398,8 +447,14 @@ td.nowrap { white-space: nowrap; }
     geplant: "Geplant", in_arbeit: "In Arbeit", fertig: "Fertig", storniert: "Storniert",
     offen: "Offen", gestellt: "Gestellt", bezahlt: "Bezahlt",
     einmalig: "Einmalig", monatlich: "Monatlich",
-    anfragewagen: "Anfragewagen", kontaktformular: "Kontaktformular", manuell: "Manuell"
+    anfragewagen: "Anfragewagen", kontaktformular: "Kontaktformular", manuell: "Manuell",
+    hoch: "Hoch", mittel: "Mittel", niedrig: "Niedrig"
   };
+  // Prioritäten
+  const PR = { hoch: 0, mittel: 1, niedrig: 2 };
+  const prio = (r) => r.prioritaet || "mittel";
+  const byPrio = (a, b) => PR[prio(a)] - PR[prio(b)];
+  const prioTag = (r, tbl) => S.prio ? `<button type="button" class="prio p-${prio(r)}" data-prio="${tbl}:${r.id}" title="Priorität: ${LABEL[prio(r)]} – tippen zum Ändern">${LABEL[prio(r)]}</button>` : "";
   const badge = (v) => `<span class="badge ${esc(v)}">${esc(LABEL[v] || v)}</span>`;
   const who = (n) => n === "Alle" ? `<span class="who all" title="Für alle">A</span>` : n ? `<span class="who" title="${esc(n)}">${esc(n.slice(0, 1).toUpperCase())}</span>` : `<span class="who none" title="Niemand zuständig">–</span>`;
 
@@ -411,7 +466,7 @@ td.nowrap { white-space: nowrap; }
 
   // ---------- Zustand ----------
   const S = { me: null, team: [], anfragen: [], kunden: [], auftraege: [], aufgaben: [], termine: [], quellen: [], rechnungen: [], einst: {}, extern: [], externAt: 0, externErr: [] };
-  const UI = { view: "uebersicht", anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenErledigt: false, kalMonat: new Date().toISOString().slice(0, 7), kalWer: "alle" };
+  const UI = { view: "uebersicht", anim: true, anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenPrio: "alle", aufgabenErledigt: false, kalMonat: new Date().toISOString().slice(0, 7), kalWer: "alle" };
   try { const v = localStorage.getItem("bn-dash-view"); if (v) UI.view = v; } catch (e) {}
   const mine = (w) => w === S.me || w === "Alle";
   const kunde = (id) => S.kunden.find((k) => k.id === id);
@@ -424,6 +479,7 @@ td.nowrap { white-space: nowrap; }
     if (err) throw err.error;
     [S.anfragen, S.kunden, S.auftraege, S.aufgaben, S.team, S.termine, S.quellen, S.rechnungen] = res.map((r) => r.data || []);
     S.einst = Object.fromEntries((res[8].data || []).map((x) => [x.schluessel, x.wert]));
+    if (S.prio == null) { const p = await db.from("aufgaben").select("prioritaet").limit(1); S.prio = !p.error; }
   }
 
   async function run(promise, okMsg) {
@@ -454,7 +510,8 @@ td.nowrap { white-space: nowrap; }
     S.me = mine.name;
     $("me-name").textContent = S.me; $("me-name-m").textContent = S.me;
     $("login").hidden = true; $("app").hidden = false;
-    render();
+    UI.anim = true; render();
+    try { live(); } catch (e) {}
   }
   $("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -471,7 +528,7 @@ td.nowrap { white-space: nowrap; }
   // ---------- Navigation ----------
   $("nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) go(b.dataset.view); });
   function go(view, patch) {
-    UI.view = view; Object.assign(UI, patch || {});
+    UI.view = view; UI.anim = true; Object.assign(UI, patch || {});
     try { localStorage.setItem("bn-dash-view", view); } catch (e) {}
     render(); window.scrollTo(0, 0);
   }
@@ -502,7 +559,23 @@ td.nowrap { white-space: nowrap; }
     setCnt("cnt-anfragen", st.neu); setCnt("cnt-aufgaben", st.meineAufgaben); setCnt("cnt-heute", st.heute); setCnt("cnt-rech", S.rechnungen.filter((r) => r.status === "offen" && r.faellig_am && r.faellig_am < today()).length);
     const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben, kalender: vKalender, beratung: vBeratung, rechnungen: vRechnungen };
     if (UI.view === "kalender") loadExtern();
-    $("view").innerHTML = (V[UI.view] || vUebersicht)(st);
+    const view = $("view");
+    view.innerHTML = (V[UI.view] || vUebersicht)(st);
+    // Einblend-Animation nur beim Wechsel der Ansicht, nicht bei Live-Updates
+    view.classList.remove("enter");
+    if (UI.anim && !RUHIG) { void view.offsetWidth; view.classList.add("enter"); zaehlen(view); }
+    UI.anim = false;
+  }
+  const RUHIG = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Zahlen in den Kacheln hochzählen
+  function zaehlen(root) {
+    root.querySelectorAll("[data-n]").forEach((el) => {
+      const ziel = Number(el.dataset.n) || 0, f = el.dataset.f === "eur" ? eur : (n) => String(Math.round(n));
+      if (!ziel) return;
+      const t0 = performance.now(), dauer = 700;
+      const step = (t) => { const p = Math.min(1, (t - t0) / dauer), e = 1 - Math.pow(1 - p, 3); el.textContent = f(p < 1 ? Math.round(ziel * e) : ziel); if (p < 1) requestAnimationFrame(step); };
+      el.textContent = f(0); requestAnimationFrame(step);
+    });
   }
 
   const head = (title, sub, acts) => `<div class="head"><div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${acts ? `<div class="acts">${acts}</div>` : ""}</div>`;
@@ -514,15 +587,16 @@ td.nowrap { white-space: nowrap; }
     const greet = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
     const neue = S.anfragen.filter((a) => a.status === "neu").slice(0, 5);
     const tasks = S.aufgaben.filter((t) => !t.erledigt && mine(t.zustaendig))
-      .sort((a, b) => (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999")).slice(0, 6);
+      .sort((a, b) => byPrio(a, b) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999")).slice(0, 6);
+    const dringend = S.aufgaben.filter((t) => !t.erledigt && mine(t.zustaendig) && prio(t) === "hoch").length;
     return head(`${greet}, ${esc(S.me)}`, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }), `<button class="btn btn-line" type="button" data-reload>Aktualisieren</button>`) +
     `<div class="kpis">
-      <button class="kpi hl" type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'><span>Neue Anfragen</span><b>${st.neu}</b><small>${st.pipeline} in Bearbeitung insgesamt</small></button>
-      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"aktiv"}'><span>Offene Aufträge</span><b>${st.offeneAuftraege}</b><small>geplant oder in Arbeit</small></button>
-      <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b>${eur(st.monatUmsatz)}</b><small>einmalige Aufträge</small></button>
-      <button class="kpi" type="button" data-go="auftraege"><span>Monatlich wiederkehrend</span><b>${eur(st.mrr)}</b><small>laufende Abos pro Monat</small></button>
-      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"unbezahlt"}'><span>Noch nicht bezahlt</span><b>${eur(st.unbezahlt)}</b><small>fertige Aufträge</small></button>
-      <button class="kpi" type="button" data-go="aufgaben" data-patch='{"aufgabenWer":"meine"}'><span>Meine offenen Aufgaben</span><b>${st.meineAufgaben}</b><small>${st.ueberfaellig ? `<span class="overdue">${st.ueberfaellig} überfällig</span>` : "nichts überfällig"}</small></button>
+      <button class="kpi hl" type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'><span>Neue Anfragen</span><b data-n="${st.neu}">${st.neu}</b><small>${st.pipeline} in Bearbeitung insgesamt</small></button>
+      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"aktiv"}'><span>Offene Aufträge</span><b data-n="${st.offeneAuftraege}">${st.offeneAuftraege}</b><small>geplant oder in Arbeit</small></button>
+      <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b data-n="${st.monatUmsatz}" data-f="eur">${eur(st.monatUmsatz)}</b><small>einmalige Aufträge</small></button>
+      <button class="kpi" type="button" data-go="auftraege"><span>Monatlich wiederkehrend</span><b data-n="${st.mrr}" data-f="eur">${eur(st.mrr)}</b><small>laufende Abos pro Monat</small></button>
+      <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"unbezahlt"}'><span>Noch nicht bezahlt</span><b data-n="${st.unbezahlt}" data-f="eur">${eur(st.unbezahlt)}</b><small>fertige Aufträge</small></button>
+      <button class="kpi" type="button" data-go="aufgaben" data-patch='{"aufgabenWer":"meine","aufgabenPrio":"alle"}'><span>Meine offenen Aufgaben</span><b data-n="${st.meineAufgaben}">${st.meineAufgaben}</b><small>${[dringend ? `<span class="overdue">${dringend} dringend</span>` : "", st.ueberfaellig ? `<span class="overdue">${st.ueberfaellig} überfällig</span>` : ""].filter(Boolean).join(" · ") || "nichts dringend"}</small></button>
     </div>
     <div class="panels">
       <section class="panel">
@@ -561,29 +635,33 @@ td.nowrap { white-space: nowrap; }
   function vAuftraege() {
     const f = UI.auftraegeFilter;
     const test = { aktiv: (a) => ["geplant", "in_arbeit"].includes(a.status), fertig: (a) => a.status === "fertig", unbezahlt: (a) => a.status === "fertig" && a.rechnung !== "bezahlt", abos: (a) => a.art === "monatlich" && a.status !== "storniert", alle: () => true };
-    const rows = S.auftraege.filter(test[f] || test.alle);
+    const aktivS = (a) => ["geplant", "in_arbeit"].includes(a.status) ? 0 : 1;
+    const rows = S.auftraege.filter(test[f] || test.alle).sort((a, b) => aktivS(a) - aktivS(b) || (aktivS(a) ? 0 : byPrio(a, b)));
     const n = (k) => S.auftraege.filter(test[k]).length;
     return head("Aufträge", "Pakete, Zusatzleistungen und Abos deiner Kunden.", `<button class="btn btn-sun" type="button" data-new="auftraege">+ Auftrag</button>`) +
     `<div class="filters">${chips("auftraegeFilter", [["aktiv", "Offen", n("aktiv")], ["fertig", "Fertig", n("fertig")], ["unbezahlt", "Nicht bezahlt", n("unbezahlt")], ["abos", "Abos", n("abos")], ["alle", "Alle", n("alle")]], f)}</div>
-    <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Auftrag</th><th>Kunde</th><th class="num">Betrag</th><th>Status</th><th>Rechnung</th><th>Abgabe</th><th>Wer</th></tr></thead><tbody>
-      ${rows.map((a) => `<tr data-open="auftraege" data-id="${a.id}"><td><b>${esc(a.titel)}</b><small>${LABEL[a.art]}</small></td><td>${esc(kName(a.kunde_id))}</td><td class="num">${eur(a.betrag)}${a.art === "monatlich" ? "<small>pro Monat</small>" : ""}</td><td>${badge(a.status)}</td><td>${badge(a.rechnung)}</td><td class="nowrap ${a.abgabe_am && a.abgabe_am < today() && ["geplant", "in_arbeit"].includes(a.status) ? "overdue" : ""}">${dDate(a.abgabe_am)}</td><td>${who(a.zustaendig)}</td></tr>`).join("")}
+    <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Auftrag</th><th>Kunde</th><th class="num">Betrag</th>${S.prio ? "<th>Priorität</th>" : ""}<th>Status</th><th>Rechnung</th><th>Abgabe</th><th>Wer</th></tr></thead><tbody>
+      ${rows.map((a) => `<tr data-open="auftraege" data-id="${a.id}"><td><b>${esc(a.titel)}</b><small>${LABEL[a.art]}</small></td><td>${esc(kName(a.kunde_id))}</td><td class="num">${eur(a.betrag)}${a.art === "monatlich" ? "<small>pro Monat</small>" : ""}</td>${S.prio ? `<td>${prioTag(a, "auftraege")}</td>` : ""}<td>${badge(a.status)}</td><td>${badge(a.rechnung)}</td><td class="nowrap ${a.abgabe_am && a.abgabe_am < today() && ["geplant", "in_arbeit"].includes(a.status) ? "overdue" : ""}">${dDate(a.abgabe_am)}</td><td>${who(a.zustaendig)}</td></tr>`).join("")}
     </tbody></table>` : emptyBox("Keine Aufträge in dieser Ansicht", "Aufträge entstehen, wenn du eine Anfrage als Kunden übernimmst, oder über „+ Auftrag“.")}</div>`;
   }
 
   function taskLi(t) {
     const late = !t.erledigt && t.faellig_am && t.faellig_am < today();
     const meta = [t.kunde_id ? esc(kName(t.kunde_id)) : "", t.faellig_am ? `<span class="${late ? "overdue" : ""}">${late ? "überfällig · " : "bis "}${dDate(t.faellig_am)}</span>` : ""].filter(Boolean).join(" · ");
-    return `<li class="${t.erledigt ? "done" : ""}"><input type="checkbox" data-toggle="${t.id}" ${t.erledigt ? "checked" : ""} aria-label="${esc(t.titel)} erledigt"><div class="grow" data-open="aufgaben" data-id="${t.id}"><b>${esc(t.titel)}</b>${meta ? `<small>${meta}</small>` : ""}</div>${who(t.zustaendig)}</li>`;
+    return `<li class="${t.erledigt ? "done" : ""} ${S.prio && !t.erledigt ? "pl-" + prio(t) : ""}"><input type="checkbox" data-toggle="${t.id}" ${t.erledigt ? "checked" : ""} aria-label="${esc(t.titel)} erledigt"><div class="grow" data-open="aufgaben" data-id="${t.id}"><b>${esc(t.titel)}</b>${meta ? `<small>${meta}</small>` : ""}</div>${t.erledigt ? "" : prioTag(t, "aufgaben")}${who(t.zustaendig)}</li>`;
   }
 
   function vAufgaben() {
     const names = S.team.map((t) => t.name);
-    const w = UI.aufgabenWer;
-    const rows = S.aufgaben.filter((t) => (UI.aufgabenErledigt || !t.erledigt) && (w === "alle" || (w === "meine" ? mine(t.zustaendig) : w === "fueralle" ? t.zustaendig === "Alle" : w === "offen" ? !t.zustaendig : t.zustaendig === w)))
-      .sort((a, b) => (a.erledigt - b.erledigt) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999"));
+    const w = UI.aufgabenWer, pf = UI.aufgabenPrio;
+    const base = S.aufgaben.filter((t) => (UI.aufgabenErledigt || !t.erledigt) && (w === "alle" || (w === "meine" ? mine(t.zustaendig) : w === "fueralle" ? t.zustaendig === "Alle" : w === "offen" ? !t.zustaendig : t.zustaendig === w)));
+    const rows = base.filter((t) => pf === "alle" || prio(t) === pf)
+      .sort((a, b) => (a.erledigt - b.erledigt) || byPrio(a, b) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999"));
     const opts = [["meine", "Meine"], ["fueralle", "Für alle"], ...names.filter((n) => n !== S.me).map((n) => [n, n]), ["offen", "Ohne Zuständigkeit"], ["alle", "Alle"]];
-    return head("Aufgaben", "Wer kümmert sich um was – mit Fristen.", `<button class="btn btn-sun" type="button" data-new="aufgaben">+ Aufgabe</button>`) +
-    `<div class="filters">${chips("aufgabenWer", opts, w)}<label class="chk" style="margin-left:8px"><input type="checkbox" id="show-done" ${UI.aufgabenErledigt ? "checked" : ""}> Erledigte zeigen</label></div>
+    const pn = (p) => base.filter((t) => !t.erledigt && prio(t) === p).length;
+    const pchips = S.prio ? `<div class="filters prio-filter">${chips("aufgabenPrio", [["alle", "Jede Priorität"], ["hoch", "Hoch", pn("hoch")], ["mittel", "Mittel", pn("mittel")], ["niedrig", "Niedrig", pn("niedrig")]], pf)}</div>` : "";
+    return head("Aufgaben", "Wer kümmert sich um was – mit Fristen und Prioritäten.", `<button class="btn btn-sun" type="button" data-new="aufgaben">+ Aufgabe</button>`) +
+    `<div class="filters">${chips("aufgabenWer", opts, w)}<label class="chk" style="margin-left:8px"><input type="checkbox" id="show-done" ${UI.aufgabenErledigt ? "checked" : ""}> Erledigte zeigen</label></div>${pchips}
     <div class="task-card">${rows.length ? `<ul class="list">${rows.map(taskLi).join("")}</ul>` : emptyBox("Keine Aufgaben", "Hier ist gerade nichts zu tun.")}</div>`;
   }
 
@@ -1300,6 +1378,7 @@ td.nowrap { white-space: nowrap; }
   const teamOptsAlle = () => [["Alle", "Alle (sieht jeder)"], ...S.team.map((t) => [t.name, t.name])];
   const kundenOpts = (req) => [...(req ? [] : [["", "– kein Kunde –"]]), ...S.kunden.map((k) => [k.id, k.firma])];
   const sel = (arr) => arr.map((v) => [v, LABEL[v]]);
+  const prioFeld = () => S.prio ? [["prioritaet", "Priorität", "select", { opts: [["hoch", "Hoch – dringend"], ["mittel", "Mittel"], ["niedrig", "Niedrig – wenn Zeit ist"]] }]] : [];
   const FORMS = {
     anfragen: { titel: "Anfrage", fields: () => [
       ["name", "Name *", "text", { req: true }], ["firma", "Firma", "text"], ["email", "E-Mail", "email"], ["telefon", "Telefon", "tel"],
@@ -1313,9 +1392,9 @@ td.nowrap { white-space: nowrap; }
       ["titel", "Titel *", "text", { req: true, full: true }], ["kunde_id", "Kunde *", "select", { opts: kundenOpts(true), req: true }], ["betrag", "Betrag (€)", "number"],
       ["art", "Abrechnung", "select", { opts: sel(["einmalig", "monatlich"]) }], ["status", "Status", "select", { opts: sel(["geplant", "in_arbeit", "fertig", "storniert"]) }],
       ["rechnung", "Rechnung", "select", { opts: sel(["offen", "gestellt", "bezahlt"]) }], ["abgabe_am", "Abgabe bis", "date"],
-      ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["notiz", "Notiz", "textarea", { full: true }]] },
+      ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ...prioFeld(), ["notiz", "Notiz", "textarea", { full: true }]] },
     aufgaben: { titel: "Aufgabe", fields: () => [
-      ["titel", "Was ist zu tun? *", "text", { req: true, full: true }], ["zustaendig", "Zuständig", "select", { opts: [teamOptsAlle()[0], ...teamOpts()] }], ["faellig_am", "Fällig am", "date"],
+      ["titel", "Was ist zu tun? *", "text", { req: true, full: true }], ["zustaendig", "Zuständig", "select", { opts: [teamOptsAlle()[0], ...teamOpts()] }], ["faellig_am", "Fällig am", "date"], ...prioFeld(),
       ["kunde_id", "Kunde", "select", { opts: kundenOpts(false) }], ["erledigt", "Erledigt", "checkbox"], ["notiz", "Notiz", "textarea", { full: true }]] },
     termine: { titel: "Termin", fields: () => [
       ["titel", "Was? *", "text", { req: true, full: true }], ["datum", "Datum *", "date", { req: true }], ["wer", "Für wen", "select", { opts: teamOptsAlle() }],
@@ -1367,7 +1446,7 @@ td.nowrap { white-space: nowrap; }
 
   function openForm(table, id, preset) {
     const rec = id ? (S[table].find((r) => r.id === id) || {}) : Object.assign(
-      { anfragen: { status: "neu", zustaendig: S.me }, kunden: { zustaendig: S.me }, auftraege: { art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me }, aufgaben: { zustaendig: S.me }, termine: { wer: S.me, datum: today() } }[table], preset || {});
+      { anfragen: { status: "neu", zustaendig: S.me }, kunden: { zustaendig: S.me }, auftraege: { art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me, prioritaet: "mittel" }, aufgaben: { zustaendig: S.me, prioritaet: "mittel" }, termine: { wer: S.me, datum: today() } }[table], preset || {});
     const F = FORMS[table];
     const title = id ? (table === "anfragen" ? (rec.firma || rec.name) : table === "kunden" ? rec.firma : rec.titel) : ({ kunden: "Neuer Kunde", auftraege: "Neuer Auftrag", termine: "Neuer Termin" }[table] || "Neue " + F.titel);
     let extra = "";
@@ -1444,6 +1523,19 @@ td.nowrap { white-space: nowrap; }
     const t = e.target;
     const g = t.closest("[data-go]");
     if (g) { go(g.dataset.go, g.dataset.patch ? JSON.parse(g.dataset.patch) : null); return; }
+    const pr = t.closest("[data-prio]");
+    if (pr) {
+      // Priorität per Antippen wechseln: Mittel → Hoch → Niedrig → Mittel
+      e.preventDefault(); e.stopPropagation();
+      const [tbl, id] = pr.dataset.prio.split(":"), rec = S[tbl].find((r) => r.id === id); if (!rec) return;
+      const neu = { mittel: "hoch", hoch: "niedrig", niedrig: "mittel" }[prio(rec)];
+      rec.prioritaet = neu; pr.className = "prio p-" + neu + " pop"; pr.textContent = LABEL[neu];
+      const { error } = await db.from(tbl).update({ prioritaet: neu }).eq("id", id);
+      if (error) { toast("Fehler: " + error.message, true); return; }
+      toast("Priorität: " + LABEL[neu]);
+      clearTimeout(pr._t); pr._t = setTimeout(async () => { await loadAll(); render(); if (dlg.open && dlg.dataset.table === "kunden") openForm("kunden", dlg.dataset.id); }, 900);
+      return;
+    }
     const fl = t.closest("[data-filter]");
     if (fl) { UI[fl.dataset.filter] = fl.dataset.val; render(); return; }
     const op = t.closest("[data-open]");
@@ -1458,6 +1550,8 @@ td.nowrap { white-space: nowrap; }
   document.addEventListener("change", async (e) => {
     const t = e.target;
     if (t.matches("[data-toggle]")) {
+      const li = t.closest("li");
+      if (li && t.checked && !RUHIG) { li.classList.add("abhaken"); await new Promise((r) => setTimeout(r, 450)); }
       await run(db.from("aufgaben").update({ erledigt: t.checked }).eq("id", t.dataset.toggle), t.checked ? "Erledigt ✓" : "Wieder offen");
       if (dlg.open && dlg.dataset.table === "kunden") openForm("kunden", dlg.dataset.id);
     }
@@ -1470,6 +1564,28 @@ td.nowrap { white-space: nowrap; }
       const s = $("kunden-suche"); s.focus(); s.setSelectionRange(pos, pos);
     }
   });
+
+  // ---------- Live: Änderungen von Luca/Noah sofort anzeigen ----------
+  let liveT = 0, liveOffen = false, kanal = null;
+  function live() {
+    if (kanal) return;
+    kanal = db.channel("bn-live");
+    ["anfragen", "kunden", "auftraege", "aufgaben", "termine", "rechnungen"].forEach((tbl) =>
+      kanal.on("postgres_changes", { event: "*", schema: "public", table: tbl }, (p) => {
+        if (tbl === "anfragen" && p.eventType === "INSERT") toast("Neue Anfrage: " + ((p.new && (p.new.firma || p.new.name)) || "über die Website"));
+        clearTimeout(liveT); liveT = setTimeout(neuLaden, 400);
+      }));
+    kanal.subscribe((status) => { const l = $("live"); if (l) l.hidden = status !== "SUBSCRIBED"; });
+  }
+  async function neuLaden() {
+    if ($("app").hidden) return;
+    if (dlg.open || document.querySelector(".beleg-view")) { liveOffen = true; return; }
+    const a = document.activeElement;
+    if (a && $("view").contains(a) && a.matches("input, textarea, select")) { clearTimeout(liveT); liveT = setTimeout(neuLaden, 3000); return; } // nicht beim Tippen stören
+    try { await loadAll(); render(); } catch (e) {}
+  }
+  dlg.addEventListener("close", () => { if (liveOffen) { liveOffen = false; neuLaden(); } });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") neuLaden(); });
 
   db.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") showLogin(); });
   start();
