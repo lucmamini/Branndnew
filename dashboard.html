@@ -225,6 +225,52 @@ td.nowrap { white-space: nowrap; }
 .box { border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
 .box h3 { font-size: 17px; }
 .box p { color: var(--muted); font-size: 14px; }
+/* Beratung */
+.stepper { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.stepper button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 9px 14px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.stepper button[aria-current="step"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.stepper button.done { color: var(--fg); border-color: var(--accent-ink); }
+.ber-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: clamp(18px, 3vw, 28px); display: grid; gap: 22px; }
+.q { display: grid; gap: 10px; }
+.q > b { font: 700 17px/1.3 var(--display); }
+.q > small { color: var(--muted); margin-top: -6px; }
+.opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.opt { border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 12px; padding: 12px 16px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: left; }
+.opt:hover { border-color: var(--accent-ink); }
+.opt[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.ber-nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.pk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .pk-grid { grid-template-columns: 1fr; } }
+.pk { border: 2px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 10px; align-content: start; cursor: pointer; background: var(--surface); text-align: left; color: var(--fg); position: relative; }
+.pk:hover { border-color: var(--accent-ink); }
+.pk[aria-pressed="true"] { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(31, 61, 43, .15); }
+.pk .rec { position: absolute; top: -11px; left: 16px; background: var(--sun); color: var(--navy); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.pk h3 { font-size: 20px; }
+.pk .pp { font: 700 30px/1 var(--display); }
+.cov { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; }
+.cov li { display: flex; gap: 8px; align-items: baseline; }
+.cov .y { color: #2F8A4E; font-weight: 700; }
+.cov .n { color: var(--err); font-weight: 700; }
+.cov .o { color: var(--muted); }
+.sum-tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
+.sum-tbl td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.sum-tbl td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sum-tbl tr.tot td { font-weight: 700; font-size: 17px; border-bottom: 0; }
+.sum-tbl tr.disc td { color: #2F8A4E; }
+.ber-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+#print { display: none; }
+@media print {
+  body > *:not(#print) { display: none !important; }
+  #print { display: block; color: #000; font: 11pt/1.5 Arial, sans-serif; padding: 10mm; }
+  #print h1 { font-size: 20pt; margin: 0 0 4mm; }
+  #print h2 { font-size: 13pt; margin: 7mm 0 2mm; }
+  #print table { width: 100%; border-collapse: collapse; }
+  #print td { padding: 2mm 0; border-bottom: 1px solid #ccc; }
+  #print td:last-child { text-align: right; }
+  #print .tot td { font-weight: 700; border-bottom: 0; }
+  #print .wm { font: 700 16pt Arial; } #print .wm span { color: #6b8f2e; }
+  #print .muted { color: #555; font-size: 9.5pt; }
+}
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, calc(100% + 40px)); visibility: hidden; background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: transform .3s ease; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 .toast.show { transform: translate(-50%, 0); visibility: visible; }
 .toast.err { background: var(--err); }
@@ -272,6 +318,7 @@ td.nowrap { white-space: nowrap; }
       <button type="button" data-view="kunden">Kunden</button>
       <button type="button" data-view="auftraege">Aufträge</button>
       <button type="button" data-view="aufgaben">Aufgaben <span class="cnt" id="cnt-aufgaben" hidden></span></button>
+      <button type="button" data-view="beratung">Beratung</button>
       <button type="button" data-view="kalender">Kalender <span class="cnt" id="cnt-heute" hidden></span></button>
     </nav>
     <div class="me">
@@ -288,6 +335,7 @@ td.nowrap { white-space: nowrap; }
 
 <dialog class="dlg" id="dlg" aria-labelledby="dlg-title"></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="print"></div>
 
 <script src="supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
@@ -419,7 +467,7 @@ td.nowrap { white-space: nowrap; }
     const st = stats();
     const setCnt = (id, n) => { const el = $(id); el.textContent = n; el.hidden = !n; };
     setCnt("cnt-anfragen", st.neu); setCnt("cnt-aufgaben", st.meineAufgaben); setCnt("cnt-heute", st.heute);
-    const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben, kalender: vKalender };
+    const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben, kalender: vKalender, beratung: vBeratung };
     if (UI.view === "kalender") loadExtern();
     $("view").innerHTML = (V[UI.view] || vUebersicht)(st);
   }
@@ -504,6 +552,215 @@ td.nowrap { white-space: nowrap; }
     return head("Aufgaben", "Wer kümmert sich um was – mit Fristen.", `<button class="btn btn-sun" type="button" data-new="aufgaben">+ Aufgabe</button>`) +
     `<div class="filters">${chips("aufgabenWer", opts, w)}<label class="chk" style="margin-left:8px"><input type="checkbox" id="show-done" ${UI.aufgabenErledigt ? "checked" : ""}> Erledigte zeigen</label></div>
     <div class="task-card">${rows.length ? `<ul class="list">${rows.map(taskLi).join("")}</ul>` : emptyBox("Keine Aufgaben", "Hier ist gerade nichts zu tun.")}</div>`;
+  }
+
+  // ---------- Beratung beim Kunden ----------
+  const PK = {
+    start: { name: "Paket Start", price: 690, items: ["Logo in 3 Varianten", "Farben und Schriften", "Visitenkarte", "Styleguide"] },
+    business: { name: "Paket Business", price: 1390, items: ["Alles aus Start", "Briefpapier und Rechnungsvorlage", "10 Social-Media-Vorlagen", "Banner und KI-Bilder", "Animiertes Logo"] },
+    komplett: { name: "Paket Komplett", price: 2490, items: ["Alles aus Business", "Website bis 5 Seiten", "Domain und E-Mail", "Google-Unternehmensprofil", "Motion-Video"] }
+  };
+  const EX = { wartung: { name: "Website-Wartung", price: 39 }, social: { name: "Social-Media-Betreuung", price: 249 } };
+  const RANK = { start: 1, business: 2, komplett: 3 };
+  // Fragen: [Schlüssel, Frage, Hinweis, Optionen [wert, text], mehrfach?]
+  const QS = [
+    ["logo", "Wie sieht es mit dem Logo aus?", "", [["neu", "Noch kein Logo"], ["alt", "Logo wirkt veraltet"], ["ok", "Logo passt, nur der Rest fehlt"]]],
+    ["druck", "Welche Drucksachen werden gebraucht?", "Mehrfachauswahl", [["visitenkarte", "Visitenkarten"], ["brief", "Briefpapier"], ["rechnung", "Rechnungs- & Angebotsvorlage"], ["flyer", "Flyer / Prospekte"]], true],
+    ["website", "Gibt es eine Website?", "", [["keine", "Keine Website"], ["alt", "Ja, aber veraltet"], ["ok", "Ja, und sie passt"]]],
+    ["online", "Was fehlt sonst online?", "Mehrfachauswahl", [["domain", "Eigene Domain & E-Mail"], ["google", "Google-Unternehmensprofil"], ["nichts", "Nichts davon"]], true],
+    ["social", "Social Media?", "", [["nein", "Nicht aktiv"], ["look", "Aktiv, aber ohne einheitlichen Look"], ["betreuung", "Soll regelmäßig betreut werden"]]],
+    ["bewegt", "Bewegtbild gewünscht?", "Animiertes Logo, kurze Videos für Social Media oder Website", [["nein", "Nein"], ["logo", "Animiertes Logo"], ["video", "Imagevideo / Motion-Video"]]],
+    ["pflege", "Wer pflegt später die Website?", "", [["selbst", "Machen wir selbst"], ["ihr", "Soll BranndNew übernehmen"], ["egal", "Noch offen"]]],
+    ["extra", "Weitere Wünsche?", "Nicht in den Paketen – separat anbieten", [["fahrzeug", "Fahrzeugbeschriftung"], ["schilder", "Schilder / Bauschild"], ["kleidung", "Arbeitskleidung"], ["fotos", "Fotoshooting"]], true],
+    ["zeit", "Bis wann soll es fertig sein?", "", [["sofort", "So schnell wie möglich"], ["monat", "In den nächsten 4 Wochen"], ["spaeter", "Kein Zeitdruck"]]],
+    ["budget", "Budget-Rahmen?", "", [["klein", "bis 1.000 €"], ["mittel", "1.000 – 2.000 €"], ["gross", "über 2.000 €"], ["offen", "Offen"]]],
+    ["gruender", "Neugründung oder junge Firma?", "Für den 30 % Gründerrabatt (erste 3 Kunden)", [["ja", "Ja"], ["nein", "Nein"]]]
+  ];
+  const label = (k, v) => { const q = QS.find((x) => x[0] === k); const o = q && q[3].find((x) => x[0] === v); return o ? o[1] : v; };
+  const blankB = () => ({ step: 1, kunde: { kunde_id: "", firma: "", ansprechpartner: "", branche: "", email: "", telefon: "" }, need: {}, wahl: "", extras: {}, rabatt: false, notiz: { text: "" } });
+  let B = blankB();
+  try { const raw = localStorage.getItem("bn-beratung"); if (raw) B = Object.assign(blankB(), JSON.parse(raw)); } catch (e) {}
+  const saveB = () => { try { localStorage.setItem("bn-beratung", JSON.stringify(B)); } catch (e) {} };
+  const has = (k, v) => Array.isArray(B.need[k]) ? B.need[k].includes(v) : B.need[k] === v;
+
+  function empfehlung() {
+    const n = B.need, why = [];
+    let p = "start";
+    const up = (to, grund) => { if (RANK[to] > RANK[p]) p = to; why.push(grund); };
+    if (n.website === "keine" || n.website === "alt") up("komplett", "Website wird gebraucht");
+    if (has("online", "domain")) up("komplett", "Domain & E-Mail fehlen");
+    if (has("online", "google")) up("komplett", "Google-Unternehmensprofil fehlt");
+    if (n.bewegt === "video") up("komplett", "Motion-Video gewünscht");
+    if (has("druck", "brief") || has("druck", "rechnung")) up("business", "Briefpapier/Rechnungsvorlage gewünscht");
+    if (n.social === "look" || n.social === "betreuung") up("business", "Social-Media-Vorlagen nötig");
+    if (n.bewegt === "logo") up("business", "Animiertes Logo gewünscht");
+    const ex = {};
+    if (n.social === "betreuung") ex.social = true;
+    if (n.pflege === "ihr" && (p === "komplett" || n.website === "ok")) ex.wartung = true;
+    return { paket: p, why, extras: ex };
+  }
+  // Was deckt welches Paket ab?
+  function abdeckung(p) {
+    const r = RANK[p], L = [];
+    const add = (ok, txt, ab) => L.push([ok ? "y" : "n", txt + (ok ? "" : " – erst ab " + ab)]);
+    if (B.need.logo && B.need.logo !== "ok") add(true, B.need.logo === "neu" ? "Neues Logo" : "Logo-Überarbeitung");
+    if (has("druck", "visitenkarte")) add(true, "Visitenkarten");
+    if (has("druck", "brief")) add(r >= 2, "Briefpapier", "Business");
+    if (has("druck", "rechnung")) add(r >= 2, "Rechnungs- & Angebotsvorlage", "Business");
+    if (B.need.social === "look" || B.need.social === "betreuung") add(r >= 2, "Social-Media-Vorlagen", "Business");
+    if (B.need.bewegt === "logo") add(r >= 2, "Animiertes Logo", "Business");
+    if (B.need.website === "keine" || B.need.website === "alt") add(r >= 3, "Website", "Komplett");
+    if (has("online", "domain")) add(r >= 3, "Domain & E-Mail", "Komplett");
+    if (has("online", "google")) add(r >= 3, "Google-Unternehmensprofil", "Komplett");
+    if (B.need.bewegt === "video") add(r >= 3, "Motion-Video", "Komplett");
+    (B.need.extra || []).forEach((x) => L.push(["o", label("extra", x) + " – separat anbieten"]));
+    if (has("druck", "flyer")) L.push(["o", "Flyer – separat anbieten"]);
+    return L;
+  }
+  function rechnung() {
+    const p = PK[B.wahl || empfehlung().paket];
+    const ex = Object.keys(EX).filter((k) => B.extras[k]);
+    const rabatt = B.rabatt ? Math.round(p.price * 0.3) : 0;
+    return { p, ex, rabatt, once: p.price - rabatt, monthly: ex.reduce((s, k) => s + EX[k].price, 0) };
+  }
+  function bedarfText() {
+    return QS.filter(([k]) => B.need[k] && (!Array.isArray(B.need[k]) || B.need[k].length))
+      .map(([k, q]) => q.replace(/\?$/, "") + ": " + (Array.isArray(B.need[k]) ? B.need[k].map((v) => label(k, v)).join(", ") : label(k, B.need[k]))).join("\n");
+  }
+
+  function vBeratung() {
+    const st = B.step, steps = ["Kunde", "Bedarf", "Paket", "Abschluss"];
+    const stepper = `<div class="stepper">${steps.map((n, i) => `<button type="button" data-bstep="${i + 1}" ${st === i + 1 ? 'aria-current="step"' : ""} class="${st > i + 1 ? "done" : ""}">${i + 1} · ${n}</button>`).join("")}</div>`;
+    const nav = (back, next, nextLbl) => `<div class="ber-nav">${back ? `<button class="btn btn-line" type="button" data-bstep="${back}">Zurück</button>` : "<span></span>"}${next ? `<button class="btn btn-sun" type="button" data-bstep="${next}">${nextLbl || "Weiter"}</button>` : ""}</div>`;
+    let body = "";
+    if (st === 1) {
+      const k = B.kunde;
+      body = `<div class="ber-card">
+        <div class="q"><b>Für wen ist die Beratung?</b><small>Bestehenden Kunden wählen oder neu eintragen.</small>
+          <label class="f">Bestehender Kunde<select data-bsel="kunde_id"><option value="">– neuer Kunde –</option>${S.kunden.map((x) => `<option value="${x.id}" ${k.kunde_id === x.id ? "selected" : ""}>${esc(x.firma)}</option>`).join("")}</select></label></div>
+        <div class="fields two">
+          ${[["firma", "Firma *"], ["ansprechpartner", "Ansprechpartner"], ["branche", "Branche"], ["telefon", "Telefon"], ["email", "E-Mail"]].map(([n, l]) => `<label class="f">${l}<input name="${n}" data-bf="kunde" value="${esc(k[n])}"></label>`).join("")}
+        </div>
+        ${nav(0, 2, "Weiter zum Bedarf")}
+      </div>`;
+    } else if (st === 2) {
+      body = `<div class="ber-card">${QS.map(([key, q, hint, opts, multi]) => `<div class="q"><b>${q}</b>${hint ? `<small>${hint}</small>` : ""}<div class="opts">${opts.map(([v, l]) => `<button type="button" class="opt" data-need="${key}" data-v="${v}" data-multi="${multi ? 1 : 0}" aria-pressed="${has(key, v)}">${l}</button>`).join("")}</div></div>`).join("")}
+        <div class="q"><b>Notizen aus dem Gespräch</b><textarea class="search" style="max-width:none;border-radius:12px;min-height:100px;padding:12px" name="text" data-bf="notiz" placeholder="z. B. Lieblingsfarbe Blau, Konkurrent XY gefällt ihm, Eröffnung am 1. März …">${esc(B.notiz.text)}</textarea></div>
+        ${nav(1, 3, "Paket-Empfehlung ansehen")}</div>`;
+    } else if (st === 3) {
+      const e = empfehlung(), wahl = B.wahl || e.paket;
+      body = `<div class="ber-card">
+        <div class="q"><b>Unsere Empfehlung: ${PK[e.paket].name}</b><small>${e.why.length ? "Weil: " + esc([...new Set(e.why)].join(" · ")) : "Für den Einstieg reicht das Start-Paket."}</small></div>
+        <div class="pk-grid">${Object.entries(PK).map(([key, p]) => `<button type="button" class="pk" data-pk="${key}" aria-pressed="${wahl === key}">${key === e.paket ? '<span class="rec">Empfohlen</span>' : ""}<h3>${p.name.replace("Paket ", "")}</h3><span class="pp">${eur(p.price)}</span>
+          <ul class="cov">${abdeckung(key).map(([c, t]) => `<li class="${c}"><span class="${c}">${c === "y" ? "✓" : c === "n" ? "✕" : "•"}</span><span>${esc(t)}</span></li>`).join("") || `<li class="o">${p.items.join(" · ")}</li>`}</ul></button>`).join("")}</div>
+        <div class="q"><b>Monatliche Extras</b><div class="opts">${Object.entries(EX).map(([k, x]) => `<button type="button" class="opt" data-ex="${k}" aria-pressed="${!!B.extras[k]}">${x.name} · ${eur(x.price)} / Monat${e.extras[k] ? " (empfohlen)" : ""}</button>`).join("")}</div></div>
+        ${nav(2, 4, "Weiter zum Abschluss")}</div>`;
+    } else {
+      const r = rechnung();
+      body = `<div class="ber-card">
+        <div class="q"><b>Zusammenfassung für ${esc(B.kunde.firma || "den Kunden")}</b></div>
+        <table class="sum-tbl"><tbody>
+          <tr><td>${r.p.name}<br><small style="color:var(--muted)">${r.p.items.join(" · ")}</small></td><td>${eur(r.p.price)}</td></tr>
+          ${r.rabatt ? `<tr class="disc"><td>Gründerrabatt 30 %</td><td>– ${eur(r.rabatt)}</td></tr>` : ""}
+          <tr class="tot"><td>Einmalig</td><td>${eur(r.once)}</td></tr>
+          ${r.ex.map((k) => `<tr><td>${EX[k].name}</td><td>${eur(EX[k].price)} / Monat</td></tr>`).join("")}
+          ${r.monthly ? `<tr class="tot"><td>Monatlich</td><td>${eur(r.monthly)}</td></tr>` : ""}
+        </tbody></table>
+        <div class="opts"><button type="button" class="opt" data-rabatt aria-pressed="${B.rabatt}">30 % Gründerrabatt anwenden</button></div>
+        ${abdeckung(B.wahl || empfehlung().paket).some((x) => x[0] === "o") ? `<div class="q"><b>Separat anbieten</b><ul class="cov">${abdeckung(B.wahl || empfehlung().paket).filter((x) => x[0] === "o").map(([, t]) => `<li><span class="o">•</span><span>${esc(t.replace(" – separat anbieten", ""))}</span></li>`).join("")}</ul></div>` : ""}
+        <div class="ber-actions">
+          <button class="btn btn-sun" type="button" data-bsave="angebot">Als Angebot speichern</button>
+          <button class="btn" type="button" data-bsave="auftrag">Auftrag direkt anlegen</button>
+          <button class="btn btn-line" type="button" data-bprint>Für den Kunden drucken / PDF</button>
+        </div>
+        <p style="color:var(--muted);font-size:14px">„Als Angebot speichern“ legt eine Anfrage mit Status <b>Angebot</b> an. „Auftrag direkt anlegen“ legt den Kunden (falls neu) und die Aufträge an.</p>
+        ${nav(3, 0)}</div>`;
+    }
+    return head("Beratung", "Leitfaden fürs Kundengespräch – Bedarf klären, Paket wählen, fertig.", `<button class="btn btn-line" type="button" data-bfull>Vollbild</button><button class="btn btn-line" type="button" data-bnew>Neue Beratung</button>`) + stepper + body;
+  }
+
+  async function berClick(e, t) {
+    const sel = t.closest("[data-bsel]");
+    if (sel) return false;
+    const stp = t.closest("[data-bstep]");
+    if (stp) {
+      const to = +stp.dataset.bstep;
+      if (to > 1 && !B.kunde.firma.trim()) { toast("Bitte zuerst die Firma eintragen", true); B.step = 1; render(); return true; }
+      B.step = to; saveB(); render(); window.scrollTo(0, 0); return true;
+    }
+    const nd = t.closest("[data-need]");
+    if (nd) {
+      const k = nd.dataset.need, v = nd.dataset.v;
+      if (nd.dataset.multi === "1") {
+        const a = new Set(B.need[k] || []), had = a.has(v);
+        had ? a.delete(v) : a.add(v);
+        if (!had && v === "nichts") { a.clear(); a.add("nichts"); } else if (v !== "nichts") a.delete("nichts");
+        B.need[k] = [...a];
+      }
+      else B.need[k] = B.need[k] === v ? undefined : v;
+      if (k === "gruender") B.rabatt = B.need.gruender === "ja";
+      B.wahl = ""; B.extras = { ...empfehlung().extras };
+      saveB(); render(); return true;
+    }
+    const pk = t.closest("[data-pk]");
+    if (pk) { B.wahl = pk.dataset.pk; saveB(); render(); return true; }
+    const ex = t.closest("[data-ex]");
+    if (ex) { B.extras[ex.dataset.ex] = !B.extras[ex.dataset.ex]; saveB(); render(); return true; }
+    if (t.closest("[data-rabatt]")) { B.rabatt = !B.rabatt; saveB(); render(); return true; }
+    if (t.closest("[data-bnew]")) { if (confirm("Neue Beratung starten? Die aktuelle Eingabe wird verworfen.")) { B = blankB(); saveB(); render(); } return true; }
+    if (t.closest("[data-bfull]")) { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (er) {} return true; }
+    if (t.closest("[data-bprint]")) { druck(); return true; }
+    const sv = t.closest("[data-bsave]");
+    if (sv) { sv.disabled = true; await speichern(sv.dataset.bsave); sv.disabled = false; return true; }
+    return false;
+  }
+  document.addEventListener("change", (e) => {
+    const sel = e.target.closest && e.target.closest("[data-bsel]");
+    if (!sel) return;
+    const k = S.kunden.find((x) => x.id === sel.value);
+    B.kunde = k ? { kunde_id: k.id, firma: k.firma || "", ansprechpartner: k.ansprechpartner || "", branche: k.branche || "", email: k.email || "", telefon: k.telefon || "" } : { ...blankB().kunde };
+    saveB(); render();
+  });
+
+  async function speichern(art) {
+    const r = rechnung(), k = B.kunde, pkKey = Object.keys(PK).find((x) => PK[x] === r.p);
+    const positionen = [{ id: pkKey, name: r.p.name, preis: r.p.price, monatlich: false }, ...r.ex.map((x) => ({ id: x, name: EX[x].name, preis: EX[x].price, monatlich: true }))];
+    const nachricht = "Beratung vom " + new Date().toLocaleDateString("de-DE") + " (" + S.me + ")\n\n" + bedarfText() + (B.notiz.text ? "\n\nNotizen:\n" + B.notiz.text : "");
+    if (art === "angebot") {
+      const ok = await run(db.from("anfragen").insert({
+        quelle: "manuell", status: "angebot", zustaendig: S.me, name: k.ansprechpartner || k.firma, firma: k.firma, email: k.email || null, telefon: k.telefon || null,
+        paket: r.p.name, positionen, summe_einmalig: r.once, summe_monatlich: r.monthly, rabatt: B.rabatt, nachricht, kunde_id: k.kunde_id || null
+      }), "Angebot gespeichert – zu finden unter Anfragen");
+      return ok;
+    }
+    let kid = k.kunde_id;
+    if (!kid) {
+      const { data, error } = await db.from("kunden").insert({ firma: k.firma, ansprechpartner: k.ansprechpartner || null, branche: k.branche || null, email: k.email || null, telefon: k.telefon || null, zustaendig: S.me, notizen: nachricht }).select().single();
+      if (error) { toast("Fehler: " + error.message, true); return false; }
+      kid = data.id; B.kunde.kunde_id = kid; saveB();
+    }
+    const jobs = [{ kunde_id: kid, titel: r.p.name + (r.rabatt ? " (inkl. 30 % Gründerrabatt)" : ""), betrag: r.once, art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me, notiz: bedarfText() },
+      ...r.ex.map((x) => ({ kunde_id: kid, titel: EX[x].name, betrag: EX[x].price, art: "monatlich", status: "geplant", rechnung: "offen", zustaendig: S.me }))];
+    const ok = await run(db.from("auftraege").insert(jobs), "Kunde und " + jobs.length + (jobs.length === 1 ? " Auftrag" : " Aufträge") + " angelegt");
+    if (ok) openForm("kunden", kid);
+    return ok;
+  }
+
+  function druck() {
+    const r = rechnung(), k = B.kunde, sep = abdeckung(B.wahl || empfehlung().paket).filter((x) => x[0] === "o");
+    $("print").innerHTML = `<div class="wm">Bran<span>n</span>dNew</div><p class="muted">BranndNew GbR · Robinstraße 10 · 30826 Garbsen · info@branndnew.de</p>
+      <h1>Ihr Brandkit-Vorschlag</h1>
+      <p>Für: <b>${esc(k.firma)}</b>${k.ansprechpartner ? " · " + esc(k.ansprechpartner) : ""}<br>Datum: ${new Date().toLocaleDateString("de-DE")} · Ansprechpartner bei uns: ${esc(S.me)}</p>
+      <h2>Ihr Bedarf</h2><p style="white-space:pre-line">${esc(bedarfText()) || "–"}</p>
+      <h2>Unser Vorschlag</h2>
+      <table><tr><td><b>${r.p.name}</b><br><span class="muted">${r.p.items.join(" · ")}</span></td><td>${eur(r.p.price)}</td></tr>
+        ${r.rabatt ? `<tr><td>Gründerrabatt 30 %</td><td>– ${eur(r.rabatt)}</td></tr>` : ""}
+        <tr class="tot"><td>Einmalig</td><td>${eur(r.once)}</td></tr>
+        ${r.ex.map((x) => `<tr><td>${EX[x].name}</td><td>${eur(EX[x].price)} / Monat</td></tr>`).join("")}
+        ${r.monthly ? `<tr class="tot"><td>Monatlich</td><td>${eur(r.monthly)}</td></tr>` : ""}</table>
+      ${sep.length ? `<h2>Auf Wunsch zusätzlich</h2><p>${sep.map((x) => esc(x[1].replace(" – separat anbieten", ""))).join(" · ")} – Preis nach Absprache.</p>` : ""}
+      <p class="muted" style="margin-top:10mm">Alle Preise sind Festpreise. Dieser Vorschlag ist unverbindlich.</p>`;
+    window.print();
   }
 
   // ---------- Kalender ----------
@@ -872,6 +1129,7 @@ td.nowrap { white-space: nowrap; }
     const nw = t.closest("[data-new]");
     if (nw) { openForm(nw.dataset.new, null, nw.dataset.kunde ? { kunde_id: nw.dataset.kunde } : nw.dataset.datum ? { datum: nw.dataset.datum } : null); return; }
     if (await calClick(e, t)) return;
+    if (await berClick(e, t)) return;
     if (t.closest("[data-reload]")) { try { await loadAll(); render(); toast("Aktualisiert"); } catch (er) { toast("Fehler: " + er.message, true); } }
   });
   document.addEventListener("change", async (e) => {
@@ -883,6 +1141,7 @@ td.nowrap { white-space: nowrap; }
     if (t.id === "show-done") { UI.aufgabenErledigt = t.checked; render(); }
   });
   document.addEventListener("input", (e) => {
+    if (e.target.dataset && e.target.dataset.bf) { B[e.target.dataset.bf][e.target.name] = e.target.value; saveB(); return; }
     if (e.target.id === "kunden-suche") {
       UI.kundenSuche = e.target.value; const pos = e.target.selectionStart; render();
       const s = $("kunden-suche"); s.focus(); s.setSelectionRange(pos, pos);
