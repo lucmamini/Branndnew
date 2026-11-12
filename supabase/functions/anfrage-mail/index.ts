@@ -7,6 +7,7 @@
 //   SMTP_PASS  = Passwort des IONOS-Postfachs
 //   MAIL_TO    = info@branndnew.de          (optional, Standard = SMTP_USER)
 //   SMTP_HOST  = smtp.ionos.de              (optional)
+//   WEBHOOK_SECRET = zufälliges Kennwort, das auch der Datenbank-Trigger mitschickt
 
 import nodemailer from "npm:nodemailer@6.9.14";
 
@@ -17,6 +18,9 @@ const esc = (v: unknown) =>
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
+  // Nur Aufrufe vom eigenen Datenbank-Trigger akzeptieren (geheimes Kennwort im Header)
+  const secret = Deno.env.get("WEBHOOK_SECRET");
+  if (!secret || req.headers.get("x-webhook-secret") !== secret) return new Response("Forbidden", { status: 403 });
 
   let payload: { type?: string; table?: string; record?: Record<string, any> };
   try { payload = await req.json(); } catch { return new Response("Bad request", { status: 400 }); }
