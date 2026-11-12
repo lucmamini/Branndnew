@@ -95,6 +95,13 @@ label.chk input { width: 18px; height: 18px; accent-color: var(--accent-ink); ma
 .live i { width: 8px; height: 8px; border-radius: 50%; background: #7BD88F; box-shadow: 0 0 0 0 rgba(123, 216, 143, .6); animation: puls 2.2s ease-out infinite; }
 @keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(123, 216, 143, .6); } 70%, 100% { box-shadow: 0 0 0 8px rgba(123, 216, 143, 0); } }
 
+/* Hinweis: Mitteilungen aktivieren */
+.push-card { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--surface); border: 1px solid #EAE09A; box-shadow: inset 4px 0 0 var(--sun); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+.push-card .push-ic { font-size: 26px; line-height: 1; }
+.push-card .grow { flex: 1 1 240px; min-width: 0; }
+.push-card b { font: 700 16px/1.3 var(--display); }
+.push-card p { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
 /* Prioritäten */
 .prio { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 4px 10px 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: transform .15s ease, background .2s ease; }
 .prio::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
@@ -468,6 +475,7 @@ td.nowrap { white-space: nowrap; }
   const S = { me: null, team: [], anfragen: [], kunden: [], auftraege: [], aufgaben: [], termine: [], quellen: [], rechnungen: [], einst: {}, extern: [], externAt: 0, externErr: [] };
   const UI = { view: "uebersicht", anim: true, anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenPrio: "alle", aufgabenErledigt: false, kalMonat: new Date().toISOString().slice(0, 7), kalWer: "alle" };
   try { const v = localStorage.getItem("bn-dash-view"); if (v) UI.view = v; } catch (e) {}
+  if (location.hash === "#aufgaben") { UI.view = "aufgaben"; UI.aufgabenWer = "meine"; history.replaceState(null, "", location.pathname); }
   const mine = (w) => w === S.me || w === "Alle";
   const kunde = (id) => S.kunden.find((k) => k.id === id);
   const kName = (id) => { const k = kunde(id); return k ? k.firma : "–"; };
@@ -512,6 +520,7 @@ td.nowrap { white-space: nowrap; }
     $("login").hidden = true; $("app").hidden = false;
     UI.anim = true; render();
     try { live(); } catch (e) {}
+    pushPruefen();
   }
   $("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -590,7 +599,7 @@ td.nowrap { white-space: nowrap; }
       .sort((a, b) => byPrio(a, b) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999")).slice(0, 6);
     const dringend = S.aufgaben.filter((t) => !t.erledigt && mine(t.zustaendig) && prio(t) === "hoch").length;
     return head(`${greet}, ${esc(S.me)}`, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }), `<button class="btn btn-line" type="button" data-reload>Aktualisieren</button>`) +
-    `<div class="kpis">
+    pushKarte() + `<div class="kpis">
       <button class="kpi hl" type="button" data-go="anfragen" data-patch='{"anfragenFilter":"neu"}'><span>Neue Anfragen</span><b data-n="${st.neu}">${st.neu}</b><small>${st.pipeline} in Bearbeitung insgesamt</small></button>
       <button class="kpi" type="button" data-go="auftraege" data-patch='{"auftraegeFilter":"aktiv"}'><span>Offene Aufträge</span><b data-n="${st.offeneAuftraege}">${st.offeneAuftraege}</b><small>geplant oder in Arbeit</small></button>
       <button class="kpi" type="button" data-go="auftraege"><span>Auftragswert ${new Date().toLocaleDateString("de-DE", { month: "long" })}</span><b data-n="${st.monatUmsatz}" data-f="eur">${eur(st.monatUmsatz)}</b><small>einmalige Aufträge</small></button>
@@ -1494,10 +1503,81 @@ td.nowrap { white-space: nowrap; }
     if (table === "anfragen" && !id) data.quelle = "manuell";
     if (table === "termine" && data.bis && !data.von) data.bis = null;
     const btn = form.querySelector('[type="submit"]'); btn.disabled = true;
+    if (table === "aufgaben") {
+      // Aufgabe speichern und bei neuer Zuständigkeit eine Push-Mitteilung auslösen
+      const vorher = id ? (S.aufgaben.find((t) => t.id === id) || {}).zustaendig : null;
+      let neuId = id;
+      const ok = await run(id ? db.from(table).update(data).eq("id", id)
+        : db.from(table).insert(data).select("id").single().then((r) => { if (r.data) neuId = r.data.id; return r; }), "Gespeichert");
+      btn.disabled = false;
+      if (!ok) return;
+      dlg.close();
+      if (data.zustaendig && data.zustaendig !== vorher && data.zustaendig !== S.me && !data.erledigt) pushSenden(neuId, data.zustaendig);
+      return;
+    }
     const ok = await run(id ? db.from(table).update(data).eq("id", id) : db.from(table).insert(data), "Gespeichert");
     btn.disabled = false;
     if (ok) dlg.close();
   });
+
+  // ---------- Push-Mitteilungen aufs Handy ----------
+  const VAPID = "BGuBgchz1SH4lDiwuFW4JJQZ52z4uYq5LiYabwcTZIWHTiqZHIjVanH7d2vrfY8TLGOjHS3jVHxkLlDCT1nDXn0";
+  const PUSH = { status: "pruefen", reg: null };   // an | aus | blockiert | installieren | nicht
+  const istIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  async function pushPruefen() {
+    const vorher = PUSH.status;
+    if (!("serviceWorker" in navigator)) PUSH.status = "nicht";
+    else {
+      try { PUSH.reg = PUSH.reg || await navigator.serviceWorker.register("sw.js"); } catch (e) { PUSH.status = "nicht"; }
+      if (PUSH.reg) {
+        if (!("PushManager" in window) || !("Notification" in window)) PUSH.status = istIOS && !alsApp() ? "installieren" : "nicht";
+        else if (Notification.permission === "denied") PUSH.status = "blockiert";
+        else {
+          const sub = await PUSH.reg.pushManager.getSubscription().catch(() => null);
+          PUSH.status = sub && Notification.permission === "granted" ? "an" : "aus";
+          if (sub && PUSH.status === "an") db.from("push_abos").upsert(aboDaten(sub), { onConflict: "endpoint" }).then(() => {});
+        }
+      }
+    }
+    if (vorher !== PUSH.status && !$("app").hidden && UI.view === "uebersicht") render();
+  }
+  const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const aboDaten = (sub) => ({ wer: S.me, endpoint: sub.endpoint, p256dh: b64(sub.getKey("p256dh")), auth: b64(sub.getKey("auth")), geraet: (istIOS ? "iPhone/iPad" : /Android/.test(navigator.userAgent) ? "Android" : "Computer") + (alsApp() ? " (App)" : "") });
+  async function pushAn(btn) {
+    if (btn) btn.disabled = true;
+    try {
+      const erlaubt = await Notification.requestPermission();
+      if (erlaubt !== "granted") { PUSH.status = erlaubt === "denied" ? "blockiert" : "aus"; render(); return; }
+      const raw = atob(VAPID.replace(/-/g, "+").replace(/_/g, "/")), key = Uint8Array.from(raw, (c) => c.charCodeAt(0));
+      const sub = (await PUSH.reg.pushManager.getSubscription()) || await PUSH.reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+      const { error } = await db.from("push_abos").upsert(aboDaten(sub), { onConflict: "endpoint" });
+      if (error) { toast("Konnte nicht gespeichert werden: " + error.message, true); return; }
+      PUSH.status = "an"; toast("Mitteilungen sind an ✓"); render();
+    } catch (e) { toast("Mitteilungen konnten nicht aktiviert werden: " + e.message, true); }
+    finally { if (btn) btn.disabled = false; }
+  }
+  async function pushSenden(aufgabeId, wer) {
+    if (!aufgabeId) return;
+    try {
+      const { data, error } = await db.functions.invoke("aufgabe-push", { body: { id: aufgabeId } });
+      if (error) return;
+      if (data && data.sent) toast(wer === "Alle" ? "Alle wurden benachrichtigt 🔔" : wer + " wurde benachrichtigt 🔔");
+    } catch (e) {}
+  }
+  function pushKarte() {
+    const s = PUSH.status;
+    if (s === "an" || s === "pruefen" || s === "nicht") return "";
+    const txt = {
+      aus: ["Mitteilungen auf diesem Gerät aktivieren", "Du bekommst eine Nachricht aufs Handy, sobald dir jemand eine Aufgabe zuteilt.", `<button class="btn btn-sun" type="button" data-push-an>Mitteilungen erlauben</button>`],
+      installieren: ["Mitteilungen gibt es nur in der App", "Auf dem iPhone: Dashboard in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Danach die App über das Icon öffnen und hier Mitteilungen erlauben.", ""],
+      blockiert: ["Mitteilungen sind blockiert", istIOS ? "iPhone: Einstellungen → Mitteilungen → BranndNew → „Mitteilungen erlauben“ einschalten." : "In den Browser- bzw. Handy-Einstellungen für diese Seite Mitteilungen wieder erlauben.", ""]
+    }[s];
+    return `<div class="push-card"><div class="push-ic" aria-hidden="true">🔔</div><div class="grow"><b>${txt[0]}</b><p>${txt[1]}</p></div>${txt[2]}</div>`;
+  }
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", (e) => {
+    if (e.data && e.data.typ === "oeffnen" && !$("app").hidden) { neuLadenSofort(); go("aufgaben", { aufgabenWer: "meine" }); }
+  });
+  async function neuLadenSofort() { try { await loadAll(); render(); } catch (e) {} }
 
   // Anfrage → Kunde + Aufträge
   async function convert(anfrageId) {
@@ -1523,6 +1603,8 @@ td.nowrap { white-space: nowrap; }
     const t = e.target;
     const g = t.closest("[data-go]");
     if (g) { go(g.dataset.go, g.dataset.patch ? JSON.parse(g.dataset.patch) : null); return; }
+    const pa = t.closest("[data-push-an]");
+    if (pa) { await pushAn(pa); return; }
     const pr = t.closest("[data-prio]");
     if (pr) {
       // Priorität per Antippen wechseln: Mittel → Hoch → Niedrig → Mittel
