@@ -183,6 +183,48 @@ td.nowrap { white-space: nowrap; }
 .dlg-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; }
 .dlg-foot .r { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
 
+/* Kalender */
+.cal-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.cal-bar h2 { font-size: 22px; min-width: 190px; }
+.cal-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cal-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.cal { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.cal-head, .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-head div { padding: 10px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); }
+.cal-day { min-height: 112px; padding: 6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px; cursor: pointer; min-width: 0; }
+.cal-day:nth-child(7n) { border-right: 0; }
+.cal-day:hover { background: var(--hover); }
+.cal-day.out { background: var(--bg); }
+.cal-day.out .dn { opacity: .45; }
+.cal-day .dn { font-size: 13px; font-weight: 600; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; }
+.cal-day.today .dn { background: var(--navy); color: #fff; }
+.ev { display: block; width: 100%; text-align: left; border: 0; border-radius: 6px; padding: 3px 6px; font-size: 12px; line-height: 1.3; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; color: #fff; background: var(--navy); }
+.ev.aufgabe { background: #D6ECF8; color: #14306B; }
+.ev.abgabe { background: #F2A65A; color: #2A1A08; }
+.ev.done { opacity: .5; text-decoration: line-through; }
+.ev:hover { filter: brightness(1.08); }
+.more { font-size: 12px; color: var(--muted); font-weight: 600; background: none; border: 0; text-align: left; padding: 0 4px; cursor: pointer; }
+@media (max-width: 760px) {
+  .cal-day { min-height: 64px; padding: 3px; }
+  .cal-head div { padding: 6px 2px; text-align: center; font-size: 11px; }
+  .cal .ev { font-size: 0; height: 6px; padding: 0; border-radius: 3px; }
+  .agenda .ev { margin-bottom: 4px; }
+  .more { font-size: 10px; }
+}
+.agenda { margin-top: 18px; }
+.agenda .day-h { font: 700 14px var(--display); margin: 14px 0 4px; color: var(--muted); }
+.who.all { background: var(--sun); color: var(--navy); }
+.src-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.src-row i { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.src-row .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.src-row small { color: var(--muted); display: block; }
+.copy { display: flex; gap: 8px; }
+.copy input { flex: 1; min-width: 0; font: 13px/1.3 ui-monospace, Consolas, monospace; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); }
+.steps-txt { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.box { border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.box h3 { font-size: 17px; }
+.box p { color: var(--muted); font-size: 14px; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, calc(100% + 40px)); visibility: hidden; background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: transform .3s ease; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 .toast.show { transform: translate(-50%, 0); visibility: visible; }
 .toast.err { background: var(--err); }
@@ -230,6 +272,7 @@ td.nowrap { white-space: nowrap; }
       <button type="button" data-view="kunden">Kunden</button>
       <button type="button" data-view="auftraege">Aufträge</button>
       <button type="button" data-view="aufgaben">Aufgaben <span class="cnt" id="cnt-aufgaben" hidden></span></button>
+      <button type="button" data-view="kalender">Kalender <span class="cnt" id="cnt-heute" hidden></span></button>
     </nav>
     <div class="me">
       <div>Angemeldet als<strong id="me-name"></strong></div>
@@ -278,7 +321,7 @@ td.nowrap { white-space: nowrap; }
     anfragewagen: "Anfragewagen", kontaktformular: "Kontaktformular", manuell: "Manuell"
   };
   const badge = (v) => `<span class="badge ${esc(v)}">${esc(LABEL[v] || v)}</span>`;
-  const who = (n) => n ? `<span class="who" title="${esc(n)}">${esc(n.slice(0, 1).toUpperCase())}</span>` : `<span class="who none" title="Niemand zuständig">–</span>`;
+  const who = (n) => n === "Alle" ? `<span class="who all" title="Für alle">A</span>` : n ? `<span class="who" title="${esc(n)}">${esc(n.slice(0, 1).toUpperCase())}</span>` : `<span class="who none" title="Niemand zuständig">–</span>`;
 
   let toastT = 0;
   function toast(msg, isErr) {
@@ -287,18 +330,19 @@ td.nowrap { white-space: nowrap; }
   }
 
   // ---------- Zustand ----------
-  const S = { me: null, team: [], anfragen: [], kunden: [], auftraege: [], aufgaben: [] };
-  const UI = { view: "uebersicht", anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenErledigt: false };
+  const S = { me: null, team: [], anfragen: [], kunden: [], auftraege: [], aufgaben: [], termine: [], quellen: [], extern: [], externAt: 0, externErr: [] };
+  const UI = { view: "uebersicht", anfragenFilter: "offen", auftraegeFilter: "aktiv", kundenSuche: "", aufgabenWer: "meine", aufgabenErledigt: false, kalMonat: new Date().toISOString().slice(0, 7), kalWer: "alle" };
   try { const v = localStorage.getItem("bn-dash-view"); if (v) UI.view = v; } catch (e) {}
+  const mine = (w) => w === S.me || w === "Alle";
   const kunde = (id) => S.kunden.find((k) => k.id === id);
   const kName = (id) => { const k = kunde(id); return k ? k.firma : "–"; };
 
   async function loadAll() {
     const q = (t) => db.from(t).select("*").order("erstellt_am", { ascending: false });
-    const res = await Promise.all([q("anfragen"), q("kunden"), q("auftraege"), q("aufgaben"), db.from("team").select("*")]);
+    const res = await Promise.all([q("anfragen"), q("kunden"), q("auftraege"), q("aufgaben"), db.from("team").select("*"), q("termine"), q("kalender_quellen")]);
     const err = res.find((r) => r.error);
     if (err) throw err.error;
-    [S.anfragen, S.kunden, S.auftraege, S.aufgaben, S.team] = res.map((r) => r.data || []);
+    [S.anfragen, S.kunden, S.auftraege, S.aufgaben, S.team, S.termine, S.quellen] = res.map((r) => r.data || []);
   }
 
   async function run(promise, okMsg) {
@@ -363,7 +407,8 @@ td.nowrap { white-space: nowrap; }
       monatUmsatz: aktiv.filter((a) => a.art === "einmalig" && a.erstellt_am.slice(0, 7) === ym).reduce((s, a) => s + Number(a.betrag), 0),
       mrr: aktiv.filter((a) => a.art === "monatlich" && a.status !== "fertig").reduce((s, a) => s + Number(a.betrag), 0),
       unbezahlt: aktiv.filter((a) => a.rechnung !== "bezahlt" && a.status === "fertig").reduce((s, a) => s + Number(a.betrag), 0),
-      meineAufgaben: S.aufgaben.filter((t) => !t.erledigt && t.zustaendig === S.me).length,
+      meineAufgaben: S.aufgaben.filter((t) => !t.erledigt && mine(t.zustaendig)).length,
+      heute: S.termine.filter((t) => t.datum === today() && mine(t.wer)).length,
       ueberfaellig: S.aufgaben.filter((t) => !t.erledigt && t.faellig_am && t.faellig_am < today()).length
     };
   }
@@ -373,8 +418,9 @@ td.nowrap { white-space: nowrap; }
     document.querySelectorAll("#nav [data-view]").forEach((b) => { if (b.dataset.view === UI.view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     const st = stats();
     const setCnt = (id, n) => { const el = $(id); el.textContent = n; el.hidden = !n; };
-    setCnt("cnt-anfragen", st.neu); setCnt("cnt-aufgaben", st.meineAufgaben);
-    const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben };
+    setCnt("cnt-anfragen", st.neu); setCnt("cnt-aufgaben", st.meineAufgaben); setCnt("cnt-heute", st.heute);
+    const V = { uebersicht: vUebersicht, anfragen: vAnfragen, kunden: vKunden, auftraege: vAuftraege, aufgaben: vAufgaben, kalender: vKalender };
+    if (UI.view === "kalender") loadExtern();
     $("view").innerHTML = (V[UI.view] || vUebersicht)(st);
   }
 
@@ -386,7 +432,7 @@ td.nowrap { white-space: nowrap; }
     const hour = new Date().getHours();
     const greet = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
     const neue = S.anfragen.filter((a) => a.status === "neu").slice(0, 5);
-    const tasks = S.aufgaben.filter((t) => !t.erledigt && t.zustaendig === S.me)
+    const tasks = S.aufgaben.filter((t) => !t.erledigt && mine(t.zustaendig))
       .sort((a, b) => (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999")).slice(0, 6);
     return head(`${greet}, ${esc(S.me)}`, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" }), `<button class="btn btn-line" type="button" data-reload>Aktualisieren</button>`) +
     `<div class="kpis">
@@ -452,16 +498,231 @@ td.nowrap { white-space: nowrap; }
   function vAufgaben() {
     const names = S.team.map((t) => t.name);
     const w = UI.aufgabenWer;
-    const rows = S.aufgaben.filter((t) => (UI.aufgabenErledigt || !t.erledigt) && (w === "alle" || (w === "meine" ? t.zustaendig === S.me : w === "offen" ? !t.zustaendig : t.zustaendig === w)))
+    const rows = S.aufgaben.filter((t) => (UI.aufgabenErledigt || !t.erledigt) && (w === "alle" || (w === "meine" ? mine(t.zustaendig) : w === "fueralle" ? t.zustaendig === "Alle" : w === "offen" ? !t.zustaendig : t.zustaendig === w)))
       .sort((a, b) => (a.erledigt - b.erledigt) || (a.faellig_am || "9999").localeCompare(b.faellig_am || "9999"));
-    const opts = [["meine", "Meine"], ...names.filter((n) => n !== S.me).map((n) => [n, n]), ["offen", "Ohne Zuständigkeit"], ["alle", "Alle"]];
+    const opts = [["meine", "Meine"], ["fueralle", "Für alle"], ...names.filter((n) => n !== S.me).map((n) => [n, n]), ["offen", "Ohne Zuständigkeit"], ["alle", "Alle"]];
     return head("Aufgaben", "Wer kümmert sich um was – mit Fristen.", `<button class="btn btn-sun" type="button" data-new="aufgaben">+ Aufgabe</button>`) +
     `<div class="filters">${chips("aufgabenWer", opts, w)}<label class="chk" style="margin-left:8px"><input type="checkbox" id="show-done" ${UI.aufgabenErledigt ? "checked" : ""}> Erledigte zeigen</label></div>
     <div class="task-card">${rows.length ? `<ul class="list">${rows.map(taskLi).join("")}</ul>` : emptyBox("Keine Aufgaben", "Hier ist gerade nichts zu tun.")}</div>`;
   }
 
+  // ---------- Kalender ----------
+  const KCOL = ["#8A63D2", "#E0457B", "#2F8A4E", "#3A7BD5", "#D9822B"];
+  const ymd = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const fnUrl = (q) => cfg.url.replace(/\/+$/, "") + "/functions/v1/kalender" + q;
+
+  // .ics-Datei aus iCloud lesen (inkl. einfacher Wiederholungen)
+  function parseICS(text) {
+    const lines = text.replace(/\r?\n[ \t]/g, "").split(/\r?\n/);
+    const evs = []; let cur = null;
+    const dt = (v) => {
+      if (/^\d{8}$/.test(v)) return { d: new Date(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8)), allDay: true };
+      const m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/);
+      if (!m) return null;
+      const d = m[7] ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6])) : new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+      return { d, allDay: false };
+    };
+    for (const line of lines) {
+      if (line === "BEGIN:VEVENT") { cur = { ex: new Set() }; continue; }
+      if (line === "END:VEVENT") { if (cur && cur.start) evs.push(cur); cur = null; continue; }
+      if (!cur) continue;
+      const i = line.indexOf(":"); if (i < 0) continue;
+      const key = line.slice(0, i).split(";")[0].toUpperCase(), val = line.slice(i + 1);
+      if (key === "SUMMARY") cur.title = val.replace(/\\([,;\\])/g, "$1").replace(/\\n/gi, " ");
+      else if (key === "DTSTART") { const x = dt(val); if (x) { cur.start = x.d; cur.allDay = x.allDay; } }
+      else if (key === "DTEND") { const x = dt(val); if (x) cur.end = x.d; }
+      else if (key === "RRULE") cur.rrule = Object.fromEntries(val.split(";").map((p) => p.split("=")));
+      else if (key === "EXDATE") val.split(",").forEach((v) => { const x = dt(v); if (x) cur.ex.add(ymd(x.d)); });
+      else if (key === "STATUS" && val === "CANCELLED") cur.cancelled = true;
+    }
+    return evs.filter((e) => !e.cancelled);
+  }
+  function expand(ev, from, to) {
+    const out = [], dur = (ev.end || ev.start) - ev.start;
+    const push = (d) => { const k = ymd(d); if (!ev.ex.has(k) && d <= to && new Date(+d + Math.max(dur, 1)) > from) out.push(d); };
+    if (!ev.rrule) { push(ev.start); return out.map((d) => ({ ...ev, start: d, end: new Date(+d + dur) })); }
+    const r = ev.rrule, iv = +(r.INTERVAL || 1), until = r.UNTIL ? (/^\d{8}/.test(r.UNTIL) ? new Date(+r.UNTIL.slice(0, 4), +r.UNTIL.slice(4, 6) - 1, +r.UNTIL.slice(6, 8), 23, 59) : null) : null;
+    let count = r.COUNT ? +r.COUNT : 1e9, n = 0;
+    const days = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+    const byday = r.BYDAY && r.FREQ === "WEEKLY" ? r.BYDAY.split(",").map((x) => days[x.slice(-2)]).filter((x) => x != null) : null;
+    let d = new Date(ev.start);
+    for (let guard = 0; guard < 2000 && d <= to && n < count && (!until || d <= until); guard++) {
+      if (byday) {
+        const wk = new Date(d); wk.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+        for (const wd of [...byday].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7))) {
+          const x = new Date(wk); x.setDate(wk.getDate() + ((wd + 6) % 7)); x.setHours(ev.start.getHours(), ev.start.getMinutes(), 0, 0);
+          if (x < ev.start || (until && x > until) || n >= count) continue;
+          n++; push(x);
+        }
+        d = new Date(wk); d.setDate(wk.getDate() + 7 * iv); d.setHours(ev.start.getHours(), ev.start.getMinutes());
+      } else {
+        n++; push(new Date(d));
+        if (r.FREQ === "DAILY") d.setDate(d.getDate() + iv);
+        else if (r.FREQ === "WEEKLY") d.setDate(d.getDate() + 7 * iv);
+        else if (r.FREQ === "MONTHLY") d.setMonth(d.getMonth() + iv);
+        else if (r.FREQ === "YEARLY") d.setFullYear(d.getFullYear() + iv);
+        else break;
+      }
+    }
+    return out.map((x) => ({ ...ev, start: x, end: new Date(+x + dur) }));
+  }
+  let externBusy = false;
+  async function loadExtern(force) {
+    if (externBusy || !S.quellen.length || (!force && Date.now() - S.externAt < 10 * 60e3)) return;
+    externBusy = true;
+    const { data } = await db.auth.getSession();
+    const tok = data.session && data.session.access_token;
+    const all = [], errs = [];
+    await Promise.all(S.quellen.map(async (q) => {
+      try {
+        const r = await fetch(fnUrl("?quelle=" + q.id), { headers: { Authorization: "Bearer " + tok, apikey: cfg.key } });
+        if (!r.ok) throw new Error(await r.text());
+        parseICS(await r.text()).forEach((ev) => all.push({ ...ev, quelle: q }));
+      } catch (e) { errs.push(q.name); }
+    }));
+    S.extern = all; S.externErr = errs; S.externAt = Date.now(); externBusy = false;
+    if (UI.view === "kalender") render();
+  }
+
+  // Alle Einträge eines Zeitraums sammeln
+  function calItems(from, to) {
+    const items = [], w = UI.kalWer;
+    const ok = (x) => w === "alle" || mine(x);
+    const inR = (d) => d >= ymd(from) && d <= ymd(to);
+    S.termine.forEach((t) => { if (ok(t.wer) && inR(t.datum)) items.push({ day: t.datum, time: t.von ? t.von.slice(0, 5) : "", title: t.titel, cls: "", open: ["termine", t.id], wer: t.wer }); });
+    S.aufgaben.forEach((a) => { if (a.faellig_am && ok(a.zustaendig) && inR(a.faellig_am) && (!a.erledigt || w === "alle")) items.push({ day: a.faellig_am, time: "", title: a.titel, cls: "aufgabe" + (a.erledigt ? " done" : ""), open: ["aufgaben", a.id], wer: a.zustaendig }); });
+    S.auftraege.forEach((o) => { if (o.abgabe_am && ["geplant", "in_arbeit"].includes(o.status) && (w === "alle" || mine(o.zustaendig) || !o.zustaendig) && inR(o.abgabe_am)) items.push({ day: o.abgabe_am, time: "", title: "Abgabe: " + o.titel, cls: "abgabe", open: ["auftraege", o.id], wer: o.zustaendig }); });
+    S.extern.forEach((ev, i) => {
+      if (w !== "alle" && ev.quelle.besitzer && !mine(ev.quelle.besitzer)) return;
+      expand(ev, from, to).forEach((x) => {
+        const last = ev.allDay ? new Date(+x.end - 1) : x.end;
+        for (let d = new Date(x.start.getFullYear(), x.start.getMonth(), x.start.getDate()), k = 0; d <= last && k < 40; d.setDate(d.getDate() + 1), k++) {
+          if (d < new Date(from.getFullYear(), from.getMonth(), from.getDate()) || d > to) continue;
+          items.push({ day: ymd(d), time: !ev.allDay && k === 0 ? String(x.start.getHours()).padStart(2, "0") + ":" + String(x.start.getMinutes()).padStart(2, "0") : "", title: ev.title || "(ohne Titel)", color: ev.quelle.farbe, ext: i, src: ev.quelle.name, start: x.start, end: x.end, allDay: ev.allDay });
+        }
+      });
+    });
+    return items.sort((a, b) => a.day.localeCompare(b.day) || (a.time || "00").localeCompare(b.time || "00"));
+  }
+  const pill = (it) => `<button type="button" class="ev ${it.cls || ""}" ${it.color ? `style="background:${esc(it.color)}"` : ""} ${it.open ? `data-open="${it.open[0]}" data-id="${it.open[1]}"` : `data-ext="${it.ext}" data-day="${it.day}"`} title="${esc((it.time ? it.time + " " : "") + it.title + (it.src ? " · " + it.src : it.wer ? " · " + it.wer : ""))}">${it.time ? it.time + " " : ""}${esc(it.title)}</button>`;
+
+  function vKalender() {
+    const [y, m] = UI.kalMonat.split("-").map(Number);
+    const first = new Date(y, m - 1, 1), start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
+    const end = new Date(start); end.setDate(start.getDate() + 41);
+    const items = calItems(start, end), by = {};
+    items.forEach((it) => (by[it.day] = by[it.day] || []).push(it));
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      const k = ymd(d), list = by[k] || [];
+      cells.push(`<div class="cal-day${d.getMonth() !== m - 1 ? " out" : ""}${k === today() ? " today" : ""}" data-calday="${k}"><span class="dn">${d.getDate()}</span>${list.slice(0, 3).map(pill).join("")}${list.length > 3 ? `<button type="button" class="more" data-dayview="${k}">+${list.length - 3} mehr</button>` : ""}</div>`);
+    }
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0); const t1 = new Date(t0); t1.setDate(t0.getDate() + 13);
+    const next = calItems(t0, t1), nb = {}; next.forEach((it) => (nb[it.day] = nb[it.day] || []).push(it));
+    const mname = first.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+    const legend = `<div class="cal-legend"><span><i style="background:var(--navy)"></i>Termine</span><span><i style="background:#D6ECF8;border:1px solid #9cc"></i>Aufgaben</span><span><i style="background:#F2A65A"></i>Abgaben</span>${S.quellen.map((q) => `<span><i style="background:${esc(q.farbe)}"></i>${esc(q.name)}</span>`).join("")}</div>`;
+    return head("Kalender", "Termine, Aufgaben und Abgaben – auch in eurem Apple Kalender.", `<button class="btn btn-line" type="button" data-apple>Mit Apple Kalender verbinden</button><button class="btn btn-sun" type="button" data-new="termine">+ Termin</button>`) +
+    `<div class="cal-bar"><button class="btn btn-line btn-sm" type="button" data-kal="-1" aria-label="Vorheriger Monat">‹</button><h2>${mname}</h2><button class="btn btn-line btn-sm" type="button" data-kal="1" aria-label="Nächster Monat">›</button><button class="btn btn-line btn-sm" type="button" data-kal="0">Heute</button><span style="flex:1"></span>${chips("kalWer", [["alle", "Alle"], ["meine", "Meine"]], UI.kalWer)}</div>
+    ${legend}${S.externErr.length ? `<p class="msg-err" style="margin-bottom:10px">Nicht erreichbar: ${esc(S.externErr.join(", "))}. Prüfe den Freigabe-Link unter „Mit Apple Kalender verbinden“.</p>` : ""}
+    <div class="cal"><div class="cal-head">${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((x) => `<div>${x}</div>`).join("")}</div><div class="cal-grid">${cells.join("")}</div></div>
+    <section class="panel agenda"><div class="panel-h"><h2>Nächste 14 Tage</h2></div>
+      ${next.length ? Object.keys(nb).map((k) => `<div class="day-h">${k === today() ? "Heute · " : ""}${new Date(k + "T00:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>${nb[k].map(pill).join("")}`).join("") : emptyBox("Nichts geplant", "Leg mit „+ Termin“ etwas an.")}
+    </section>`;
+  }
+
+  // Klicks im Kalender
+  async function calClick(e, t) {
+    const k = t.closest("[data-kal]");
+    if (k) {
+      const v = +k.dataset.kal;
+      if (v === 0) UI.kalMonat = today().slice(0, 7);
+      else { const [y, m] = UI.kalMonat.split("-").map(Number); const d = new Date(y, m - 1 + v, 1); UI.kalMonat = ymd(d).slice(0, 7); }
+      render(); return true;
+    }
+    const ex = t.closest("[data-ext]");
+    if (ex) {
+      const ev = S.extern[+ex.dataset.ext]; if (!ev) return true;
+      const it = calItems(new Date(ex.dataset.day + "T00:00:00"), new Date(ex.dataset.day + "T23:59:59")).find((x) => x.ext === +ex.dataset.ext);
+      const when = ev.allDay ? "ganztägig" : it ? it.start.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " – " + it.end.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr" : "";
+      dlg.innerHTML = `<form method="dialog" novalidate><div class="dlg-h"><div><h2 id="dlg-title">${esc(ev.title || "(ohne Titel)")}</h2><p>${new Date(ex.dataset.day + "T00:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })} · ${esc(when)}</p></div><button class="x" type="button" data-close aria-label="Schließen">×</button></div>
+        <div class="info"><dl><dt>Kalender</dt><dd><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${esc(ev.quelle.farbe)}"></i> ${esc(ev.quelle.name)}</dd></dl></div>
+        <p style="color:var(--muted);font-size:14px">Dieser Termin kommt aus dem Apple Kalender und lässt sich nur dort ändern.</p>
+        <div class="dlg-foot"><div class="r"><button class="btn" type="submit">OK</button></div></div></form>`;
+      dlg.dataset.table = "info"; dlg.dataset.id = ""; if (!dlg.open) dlg.showModal(); return true;
+    }
+    const dv = t.closest("[data-dayview]");
+    if (dv) {
+      const day = dv.dataset.dayview, list = calItems(new Date(day + "T00:00:00"), new Date(day + "T23:59:59"));
+      dlg.innerHTML = `<form method="dialog" novalidate><div class="dlg-h"><div><h2 id="dlg-title">${new Date(day + "T00:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</h2></div><button class="x" type="button" data-close aria-label="Schließen">×</button></div>
+        <div style="display:grid;gap:6px">${list.map(pill).join("")}</div>
+        <div class="dlg-foot"><div class="r"><button class="btn btn-sun" type="button" data-new="termine" data-datum="${day}">+ Termin an diesem Tag</button></div></div></form>`;
+      dlg.dataset.table = "info"; dlg.dataset.id = ""; if (!dlg.open) dlg.showModal(); return true;
+    }
+    const cd = t.closest("[data-calday]");
+    if (cd && !t.closest(".ev")) { openForm("termine", null, { datum: cd.dataset.calday }); return true; }
+    if (t.closest("[data-apple]")) { await openApple(); return true; }
+    const cp = t.closest("[data-copy]");
+    if (cp) { const inp = $(cp.dataset.copy); inp.select(); try { await navigator.clipboard.writeText(inp.value); toast("Link kopiert"); } catch (er) { document.execCommand("copy"); toast("Link kopiert"); } return true; }
+    const del = t.closest("[data-srcdel]");
+    if (del) { if (confirm("Diesen Apple Kalender aus dem Dashboard entfernen?")) { const { error } = await db.from("kalender_quellen").delete().eq("id", del.dataset.srcdel); if (error) toast("Fehler: " + error.message, true); await loadAll(); S.externAt = 0; await openApple(); render(); } return true; }
+    if (t.closest("[data-renew]")) {
+      if (!confirm("Neuen Abo-Link erzeugen? Die bisherigen Abos auf iPhone und Mac funktionieren danach nicht mehr und müssen neu eingerichtet werden.")) return true;
+      const neu = (crypto.randomUUID() + crypto.randomUUID()).replace(/-/g, "");
+      const { error } = await db.from("einstellungen").upsert({ schluessel: "ics_token", wert: neu });
+      if (error) toast("Fehler: " + error.message, true); else { toast("Neuer Link erzeugt"); await openApple(); }
+      return true;
+    }
+    return false;
+  }
+
+  // Dialog: Mit Apple Kalender verbinden
+  async function openApple() {
+    const { data } = await db.from("einstellungen").select("wert").eq("schluessel", "ics_token").maybeSingle();
+    const token = data ? data.wert : "";
+    const host = cfg.url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+    const link = (wer) => "webcal://" + host + "/functions/v1/kalender?token=" + token + (wer ? "&wer=" + encodeURIComponent(wer) : "");
+    const people = [...S.team.map((t) => t.name)];
+    dlg.innerHTML = `<form method="dialog" id="dlg-form" novalidate>
+      <div class="dlg-h"><div><h2 id="dlg-title">Mit Apple Kalender verbinden</h2><p>Funktioniert auf iPhone, iPad und Mac.</p></div><button class="x" type="button" data-close aria-label="Schließen">×</button></div>
+      <div class="box"><h3>1 · Dashboard im Apple Kalender anzeigen</h3>
+        <p>Jeder abonniert seinen eigenen Link. Darin stehen seine Termine, die Termine „für alle“, fällige Aufgaben und Abgaben. Neue Einträge erscheinen nach spätestens etwa 15–60 Minuten.</p>
+        ${people.map((n, i) => `<div><b style="font-size:14px">${esc(n)}${n === S.me ? " (du)" : ""}</b><div class="copy" style="margin-top:6px"><input id="ics${i}" readonly value="${esc(link(n))}"><button class="btn btn-line btn-sm" type="button" data-copy="ics${i}">Kopieren</button><a class="btn btn-sm" href="${esc(link(n))}">Abonnieren</a></div></div>`).join("")}
+        <ol class="steps-txt"><li><b>Am iPhone/Mac:</b> hier auf „Abonnieren“ tippen → Kalender-App öffnet sich → „Abonnieren“ bestätigen.</li>
+          <li><b>Oder von Hand:</b> Link kopieren → Mac: Kalender → Ablage → Neues Kalenderabonnement · iPhone: Einstellungen → Kalender → Accounts → Account hinzufügen → Andere → Kalenderabo hinzufügen.</li>
+          <li>Am Mac bei „Ort“ <b>iCloud</b> wählen, dann erscheint das Abo auch auf dem iPhone.</li></ol>
+        <p>Der Link ist geheim – nicht weitergeben. <button type="button" class="more" style="font-size:13px;color:var(--accent-ink);text-decoration:underline" data-renew>Neuen Link erzeugen</button></p>
+      </div>
+      <div class="box"><h3>2 · Eure Apple Kalender im Dashboard anzeigen</h3>
+        ${S.quellen.length ? S.quellen.map((q) => `<div class="src-row"><i style="background:${esc(q.farbe)}"></i><div class="grow"><b>${esc(q.name)}</b><small>${esc(q.besitzer || "")}</small></div><button class="btn btn-danger btn-sm" type="button" data-srcdel="${q.id}">Entfernen</button></div>`).join("") : `<p>Noch kein Apple Kalender verbunden.</p>`}
+        <ol class="steps-txt"><li>iPhone: Kalender-App → unten „Kalender“ → beim gewünschten Kalender auf ⓘ tippen.</li>
+          <li>„Öffentlicher Kalender“ einschalten → „Link teilen…“ → „Kopieren“.</li>
+          <li>Link hier unten einfügen und speichern. (Mac: Kalender → Rechtsklick auf den Kalender → Teilen → „Öffentlicher Kalender“.)</li></ol>
+        <p>Hinweis: Wer den öffentlichen Link kennt, kann diesen Kalender lesen. Nehmt am besten einen eigenen Arbeits-Kalender statt eures privaten.</p>
+        <div class="fields two">
+          <label class="f">Name<input name="q_name" placeholder="z. B. Luca Arbeit"></label>
+          <label class="f">Gehört zu<select name="q_besitzer">${people.map((n) => `<option ${n === S.me ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></label>
+          <label class="f full">Freigabe-Link (beginnt mit webcal://)<input name="q_url" placeholder="webcal://p…-caldav.icloud.com/published/2/…"></label>
+          <label class="f">Farbe<select name="q_farbe">${KCOL.map((c, i) => `<option value="${c}" ${i === S.quellen.length % KCOL.length ? "selected" : ""}>${["Lila", "Pink", "Grün", "Blau", "Orange"][i]}</option>`).join("")}</select></label>
+        </div>
+        <p class="msg-err" id="dlg-err" role="alert" hidden></p>
+      </div>
+      <div class="dlg-foot"><div class="r"><button class="btn btn-line" type="button" data-close>Schließen</button><button class="btn" type="submit">Apple Kalender hinzufügen</button></div></div>
+    </form>`;
+    dlg.dataset.table = "apple"; dlg.dataset.id = "";
+    if (!dlg.open) dlg.showModal();
+  }
+  async function addQuelle(form) {
+    const err = $("dlg-err"), name = form.q_name.value.trim(), url = form.q_url.value.trim();
+    if (!name || !/^(webcal|https):\/\//i.test(url)) { err.textContent = "Bitte Name und einen gültigen Link (webcal://…) eingeben."; err.hidden = false; return; }
+    const { error } = await db.from("kalender_quellen").insert({ name, url, besitzer: form.q_besitzer.value, farbe: form.q_farbe.value });
+    if (error) { err.textContent = "Fehler: " + error.message; err.hidden = false; return; }
+    await loadAll(); S.externAt = 0; toast("Apple Kalender verbunden"); await loadExtern(true); await openApple(); render();
+  }
+
   // ---------- Formulare ----------
   const teamOpts = () => [["", "– niemand –"], ...S.team.map((t) => [t.name, t.name])];
+  const teamOptsAlle = () => [["Alle", "Alle (sieht jeder)"], ...S.team.map((t) => [t.name, t.name])];
   const kundenOpts = (req) => [...(req ? [] : [["", "– kein Kunde –"]]), ...S.kunden.map((k) => [k.id, k.firma])];
   const sel = (arr) => arr.map((v) => [v, LABEL[v]]);
   const FORMS = {
@@ -479,8 +740,12 @@ td.nowrap { white-space: nowrap; }
       ["rechnung", "Rechnung", "select", { opts: sel(["offen", "gestellt", "bezahlt"]) }], ["abgabe_am", "Abgabe bis", "date"],
       ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["notiz", "Notiz", "textarea", { full: true }]] },
     aufgaben: { titel: "Aufgabe", fields: () => [
-      ["titel", "Was ist zu tun? *", "text", { req: true, full: true }], ["zustaendig", "Zuständig", "select", { opts: teamOpts() }], ["faellig_am", "Fällig am", "date"],
-      ["kunde_id", "Kunde", "select", { opts: kundenOpts(false) }], ["erledigt", "Erledigt", "checkbox"], ["notiz", "Notiz", "textarea", { full: true }]] }
+      ["titel", "Was ist zu tun? *", "text", { req: true, full: true }], ["zustaendig", "Zuständig", "select", { opts: [teamOptsAlle()[0], ...teamOpts()] }], ["faellig_am", "Fällig am", "date"],
+      ["kunde_id", "Kunde", "select", { opts: kundenOpts(false) }], ["erledigt", "Erledigt", "checkbox"], ["notiz", "Notiz", "textarea", { full: true }]] },
+    termine: { titel: "Termin", fields: () => [
+      ["titel", "Was? *", "text", { req: true, full: true }], ["datum", "Datum *", "date", { req: true }], ["wer", "Für wen", "select", { opts: teamOptsAlle() }],
+      ["von", "Von (leer = ganztägig)", "time"], ["bis", "Bis", "time"], ["ort", "Ort", "text"], ["kunde_id", "Kunde", "select", { opts: kundenOpts(false) }],
+      ["notiz", "Notiz", "textarea", { full: true }]] }
   };
 
   function fieldHtml([name, label, type, o = {}], rec) {
@@ -489,7 +754,7 @@ td.nowrap { white-space: nowrap; }
     if (type === "checkbox") return `<label class="chk"><input type="checkbox" name="${name}" ${v ? "checked" : ""}> ${label}</label>`;
     if (type === "select") return `<label class="${cls}">${label}<select name="${name}" ${o.req ? "required" : ""}>${(o.req && !v ? `<option value="">Bitte wählen …</option>` : "") + o.opts.map(([ov, ol]) => `<option value="${esc(ov)}" ${String(v ?? "") === String(ov) ? "selected" : ""}>${esc(ol)}</option>`).join("")}</select></label>`;
     if (type === "textarea") return `<label class="${cls}">${label}<textarea name="${name}">${esc(v)}</textarea></label>`;
-    return `<label class="${cls}">${label}<input type="${type}" name="${name}" value="${esc(v)}" ${type === "number" ? 'step="0.01" min="0" inputmode="decimal"' : ""} ${o.req ? "required" : ""}></label>`;
+    return `<label class="${cls}">${label}<input type="${type}" name="${name}" value="${esc(type === "time" && v ? String(v).slice(0, 5) : v)}" ${type === "number" ? 'step="0.01" min="0" inputmode="decimal"' : ""} ${o.req ? "required" : ""}></label>`;
   }
 
   function readForm(form, table) {
@@ -527,9 +792,9 @@ td.nowrap { white-space: nowrap; }
 
   function openForm(table, id, preset) {
     const rec = id ? (S[table].find((r) => r.id === id) || {}) : Object.assign(
-      { anfragen: { status: "neu", zustaendig: S.me }, kunden: { zustaendig: S.me }, auftraege: { art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me }, aufgaben: { zustaendig: S.me } }[table], preset || {});
+      { anfragen: { status: "neu", zustaendig: S.me }, kunden: { zustaendig: S.me }, auftraege: { art: "einmalig", status: "geplant", rechnung: "offen", zustaendig: S.me }, aufgaben: { zustaendig: S.me }, termine: { wer: S.me, datum: today() } }[table], preset || {});
     const F = FORMS[table];
-    const title = id ? (table === "anfragen" ? (rec.firma || rec.name) : table === "kunden" ? rec.firma : rec.titel) : "Neue" + (table === "kunden" ? "r " : table === "auftraege" ? "r " : " ") + F.titel;
+    const title = id ? (table === "anfragen" ? (rec.firma || rec.name) : table === "kunden" ? rec.firma : rec.titel) : ({ kunden: "Neuer Kunde", auftraege: "Neuer Auftrag", termine: "Neuer Termin" }[table] || "Neue " + F.titel);
     let extra = "";
     if (id && table === "anfragen") extra = anfrageInfo(rec);
     const after = id && table === "kunden" ? relLists(rec) : "";
@@ -563,10 +828,13 @@ td.nowrap { white-space: nowrap; }
   dlg.addEventListener("submit", async (e) => {
     e.preventDefault();
     const table = dlg.dataset.table, id = dlg.dataset.id, form = e.target, err = $("dlg-err");
+    if (table === "apple") { await addQuelle(form); return; }
+    if (table === "info") { dlg.close(); return; }
     const missing = [...form.querySelectorAll("[required]")].find((el) => !el.value.trim());
     if (missing) { err.textContent = "Bitte fülle alle Pflichtfelder (*) aus."; err.hidden = false; missing.focus(); return; }
     const data = readForm(form, table);
     if (table === "anfragen" && !id) data.quelle = "manuell";
+    if (table === "termine" && data.bis && !data.von) data.bis = null;
     const btn = form.querySelector('[type="submit"]'); btn.disabled = true;
     const ok = await run(id ? db.from(table).update(data).eq("id", id) : db.from(table).insert(data), "Gespeichert");
     btn.disabled = false;
@@ -602,7 +870,8 @@ td.nowrap { white-space: nowrap; }
     const op = t.closest("[data-open]");
     if (op && !t.closest("input")) { e.preventDefault(); openForm(op.dataset.open, op.dataset.id); return; }
     const nw = t.closest("[data-new]");
-    if (nw) { openForm(nw.dataset.new, null, nw.dataset.kunde ? { kunde_id: nw.dataset.kunde } : null); return; }
+    if (nw) { openForm(nw.dataset.new, null, nw.dataset.kunde ? { kunde_id: nw.dataset.kunde } : nw.dataset.datum ? { datum: nw.dataset.datum } : null); return; }
+    if (await calClick(e, t)) return;
     if (t.closest("[data-reload]")) { try { await loadAll(); render(); toast("Aktualisiert"); } catch (er) { toast("Fehler: " + er.message, true); } }
   });
   document.addEventListener("change", async (e) => {
