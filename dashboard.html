@@ -680,8 +680,8 @@ td.nowrap { white-space: nowrap; }
     <div class="tbl-wrap">${rows.length ? `<table><thead><tr><th>Nummer</th><th>Kunde</th><th>Datum</th><th>Fällig</th><th class="num">Betrag</th><th>Status</th></tr></thead><tbody>
       ${rows.map((r) => `<tr data-rech="${r.id}"><td><b>${esc(r.nummer)}</b></td><td>${esc(kName(r.kunde_id))}</td><td class="nowrap">${dDate(r.rechnungsdatum)}</td><td class="nowrap ${r.status === "offen" && r.faellig_am < today() ? "overdue" : ""}">${dDate(r.faellig_am)}</td><td class="num">${money(r.summe)}</td><td>${badge(r.status === "offen" ? "offen" : r.status === "bezahlt" ? "bezahlt" : "storniert")}</td></tr>`).join("")}
     </tbody></table>` : emptyBox("Noch keine Rechnungen", "Erstelle die erste über „+ Rechnung“ oder direkt beim Kunden.")}</div>
-    <section class="panel" style="margin-top:16px"><div class="panel-h"><h2>Leere Vorlagen</h2></div><p style="color:var(--muted);font-size:14px;margin-bottom:10px">Zum Ausfüllen von Hand, z. B. in einem PDF-Programm.</p>
-      <div class="vorl"><a class="btn btn-line" href="vorlagen/BranndNew_Rechnung.pdf" target="_blank" rel="noopener">Rechnung (PDF)</a><a class="btn btn-line" href="vorlagen/BranndNew_Briefpapier.pdf" target="_blank" rel="noopener">Briefpapier (PDF)</a></div></section>`;
+    <section class="panel" style="margin-top:16px"><div class="panel-h"><h2>Vorlagen &amp; Druckdateien</h2></div><p style="color:var(--muted);font-size:14px;margin-bottom:10px">Leere Rechnung und Briefpapier zum Ausfüllen von Hand, Visitenkarte als fertige Druckdatei für die Druckerei.</p>
+      <div class="vorl"><a class="btn btn-line" href="vorlagen/BranndNew_Rechnung.pdf" target="_blank" rel="noopener">Rechnung (PDF)</a><a class="btn btn-line" href="vorlagen/BranndNew_Briefpapier.pdf" target="_blank" rel="noopener">Briefpapier (PDF)</a><a class="btn btn-line" href="vorlagen/BranndNew_Visitenkarte_Druckdatei.pdf" target="_blank" rel="noopener">Visitenkarte – Druckdatei (PDF)</a></div></section>`;
   }
 
   // Rechnung anlegen
