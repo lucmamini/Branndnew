@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#1F3D2B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231F3D2B'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='32' fill='%23FFFFFF'%3En%3Ctspan fill='%23F2E863'%3En%3C/tspan%3E%3C/text%3E%3C/svg%3E">
-<link rel="manifest" href="app/dashboard.webmanifest">
-<link rel="apple-touch-icon" href="app/apple-touch-icon.png">
+<link rel="manifest" href="app/dashboard.webmanifest?v=2">
+<link rel="apple-touch-icon" href="app/apple-touch-icon.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BranndNew">
@@ -92,8 +92,8 @@ label.chk input { width: 18px; height: 18px; accent-color: var(--accent-ink); ma
 .side nav svg { display: none; }
 /* Handy: Kopfzeile oben, Navigation als Leiste unten (wie eine App) */
 @media (max-width: 860px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
-  .side { position: sticky; top: 0; z-index: 20; height: auto; padding: calc(12px + env(safe-area-inset-top)) 16px 12px; gap: 0; }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; }
+  .side { position: sticky; top: 0; z-index: 20; height: auto; align-self: start; padding: calc(12px + env(safe-area-inset-top)) 16px 12px; gap: 0; }
   .side .wordmark small, .side .me { display: none; }
   .side nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; overflow-x: auto; gap: 0; scrollbar-width: none; background: var(--side-bg); border-top: 1px solid var(--side-line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
   .side nav::-webkit-scrollbar { display: none; }
