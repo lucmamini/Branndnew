@@ -948,7 +948,7 @@ td.nowrap { white-space: nowrap; }
         <div class="ber-actions">
           <button class="btn btn-sun" type="button" data-bsave="angebot">Als Angebot speichern</button>
           <button class="btn" type="button" data-bsave="auftrag">Auftrag direkt anlegen</button>
-          <button class="btn btn-line" type="button" data-bprint>Für den Kunden drucken / PDF</button>
+          <button class="btn btn-line" type="button" data-bprint>Angebot für den Kunden (PDF)</button>
         </div>
         <p style="color:var(--muted);font-size:14px">„Als Angebot speichern“ legt eine Anfrage mit Status <b>Angebot</b> an. „Auftrag direkt anlegen“ legt den Kunden (falls neu) und die Aufträge an.</p>
         ${nav(3, 0)}</div>`;
@@ -1023,22 +1023,28 @@ td.nowrap { white-space: nowrap; }
     return ok;
   }
 
+  // Angebot im Rechnungs-Design (gleiche Vorlage wie die Rechnungen)
   function druck() {
-    const r = rechnung(), k = B.kunde, sep = abdeckung(B.wahl || empfehlung().paket).filter((x) => x[0] === "o");
-    $("print").innerHTML = `<div class="wm">Bran<span>n</span>dNew</div><p class="muted">BranndNew GbR · Robinstraße 10 · 30826 Garbsen · info@branndnew.de</p>
-      <h1>Ihr Brandkit-Vorschlag</h1>
-      <p>Für: <b>${esc(k.firma)}</b>${k.ansprechpartner ? " · " + esc(k.ansprechpartner) : ""}<br>Datum: ${new Date().toLocaleDateString("de-DE")} · Ansprechpartner bei uns: ${esc(S.me)}</p>
-      <h2>Ihr Bedarf</h2><p style="white-space:pre-line">${esc(bedarfText()) || "–"}</p>
-      <h2>Unser Vorschlag</h2>
-      <table><tr><td><b>${r.p.name}</b><br><span class="muted">${r.p.items.join(" · ")}</span></td><td>${eur(r.p.price)}</td></tr>
-        ${r.rabatt ? `<tr><td>Gründerrabatt 30 %</td><td>– ${eur(r.rabatt)}</td></tr>` : ""}
-        <tr class="tot"><td>Einmalig</td><td>${eur(r.once)}</td></tr>
-        ${r.ex.map((x) => `<tr><td>${EX[x].name}</td><td>${eur(EX[x].price)} / Monat</td></tr>`).join("")}
-        ${r.monthly ? `<tr class="tot"><td>Monatlich</td><td>${eur(r.monthly)}</td></tr>` : ""}</table>
-      ${sep.length ? `<h2>Auf Wunsch zusätzlich</h2><p>${sep.map((x) => esc(x[1].replace(" – separat anbieten", ""))).join(" · ")} – Preis nach Absprache.</p>` : ""}
-      <p class="muted" style="margin-top:10mm">Alle Preise sind Festpreise. Dieser Vorschlag ist unverbindlich.</p>`;
-    window.print();
+    const r = rechnung(), k = B.kunde, kk = k.kunde_id ? kunde(k.kunde_id) : null;
+    const sep = abdeckung(B.wahl || empfehlung().paket).filter((x) => x[0] === "o").map((x) => x[1].replace(" – separat anbieten", ""));
+    const pos = [{ titel: r.p.name, beschreibung: PKDESC[r.p.name] || r.p.items.join(" · "), menge: 1, preis: r.p.price }];
+    if (r.rabatt) pos.push({ titel: "Gründerrabatt 30 %", beschreibung: "Exklusiv für unsere ersten Kunden", menge: 1, preis: -r.rabatt });
+    r.ex.forEach((x) => pos.push({ titel: EX[x].name + " (monatlich)", beschreibung: PKDESC[EX[x].name] || "", menge: 1, preis: EX[x].price, monatlich: true }));
+    const zeile = (p, i) => `<tr><td>${String(i + 1).padStart(2, "0")}</td><td><b>${esc(p.titel)}</b>${p.beschreibung ? `<small>${esc(p.beschreibung)}</small>` : ""}</td><td class="c">1</td><td class="r ${p.preis < 0 ? "neg" : ""}">${p.preis < 0 ? "−" + money(-p.preis) : money(p.preis)}${p.monatlich ? "<small>pro Monat</small>" : ""}</td><td class="r ${p.preis < 0 ? "neg" : ""}"><b>${p.preis < 0 ? "−" + money(-p.preis) : money(p.preis)}</b></td></tr>`;
+    const empf = kk ? anschrift(kk) : [k.firma, k.ansprechpartner].filter(Boolean).join("\n");
+    const nr = "AN-" + today().slice(0, 4) + "-" + today().slice(5, 7) + today().slice(8, 10);
+    zeige(beleg({
+      titel: "Angebot " + (k.firma || ""), empfaenger: empf,
+      meta: [["Angebotsnr.", nr], ["Angebotsdatum", dde(today())], ["Gültig bis", dde(addDays(today(), 30))], ["Kundennr.", knr(kk)], ["Ansprechpartner", S.me]].filter((x) => x[1]),
+      inhalt: `<div class="ttl"><h1>Angebot</h1><span class="nr">Nr. ${nr}</span></div>
+        <p>Hallo ${esc(k.ansprechpartner || "")}, vielen Dank für das nette Gespräch. Wie besprochen schlagen wir Ihnen für ${esc(k.firma || "Ihre Firma")} vor:</p>
+        <table class="pos"><thead><tr><th style="width:12mm">POS.</th><th>LEISTUNG</th><th class="c" style="width:18mm">MENGE</th><th class="r" style="width:28mm">EINZELPREIS</th><th class="r" style="width:28mm">GESAMT</th></tr></thead><tbody>${pos.map(zeile).join("")}</tbody></table>
+        <div class="foot2"><div class="l">${sep.length ? `Auf Wunsch zusätzlich: <b>${esc(sep.join(", "))}</b> – Preis nach Absprache.<br>` : ""}Alle Preise sind Festpreise. Dieses Angebot ist unverbindlich und 30 Tage gültig.
+          <div class="small">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</div><div class="gruss">Auf einen starken Auftritt! – Luca &amp; Noah</div></div>
+          <div class="tot"><div><span>Zwischensumme</span><span>${money(r.once)}</span></div><div><span>Umsatzsteuer</span><span>0,00 €</span></div>${r.monthly ? `<div><span>Monatlich zusätzlich</span><span>${money(r.monthly)}</span></div>` : ""}<div class="g"><b>Einmalig</b><span>${money(r.once)}</span></div></div></div>`
+    }));
   }
+
 
   // ---------- Kalender ----------
   const KCOL = ["#8A63D2", "#E0457B", "#2F8A4E", "#3A7BD5", "#D9822B"];
