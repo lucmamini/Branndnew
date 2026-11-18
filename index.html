@@ -346,6 +346,23 @@ html.lock { overflow: hidden; }
 .kit-items li { display: flex; gap: 10px; align-items: baseline; }
 .kit-items li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sky); flex: none; transform: translateY(-2px); }
 @media (max-width: 860px) { .kit { grid-template-columns: minmax(0, 1fr); } }
+/* Linke Spalte: Seitenbild + Markenvorschau füllen die Höhe der Info-Kachel */
+.kit-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.kit-mock { --mb: #1F3D2B; --mf: #fff; --ma: #F2E863; flex: 1 1 auto; min-height: 170px; position: relative; overflow: hidden; isolation: isolate; border-radius: var(--r); background: var(--mb); color: var(--mf); padding: clamp(18px, 2.4vw, 26px); display: grid; grid-template-rows: auto 1fr auto; gap: 14px; }
+.kit-mock::before { content: ""; position: absolute; z-index: -1; width: 70%; aspect-ratio: 1; right: -18%; top: -45%; border-radius: 50%; background: var(--ma); opacity: .18; transition: transform .8s cubic-bezier(.2, .7, .2, 1); }
+.kit-mock:hover::before { transform: translate(-6%, 10%) scale(1.08); }
+.kit-mock .tile-label { color: var(--mf); opacity: .7; }
+.mock-name { align-self: center; display: grid; gap: 6px; }
+.mock-name b { font-size: clamp(24px, 3vw, 34px); line-height: 1.05; letter-spacing: -0.01em; }
+.mock-name small { font-size: 14px; opacity: .78; }
+.mock-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.mock-sw { display: flex; }
+.mock-sw i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--mf); margin-right: -7px; }
+.mock-cta { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/1 var(--body); color: var(--mb); background: var(--mf); padding: 11px 16px; border-radius: 999px; text-decoration: none; transition: transform .15s ease; }
+.mock-cta:hover { transform: translateY(-2px); }
+.mock-cta span { transition: transform .2s ease; }
+.mock-cta:hover span { transform: translateX(3px); }
+.js-motion .kit.anim .kit-mock { animation: tileIn .8s cubic-bezier(.2, .7, .2, 1) .28s both; }
 .pal { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .pal li { display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; font-size: 15px; }
 .pal i { width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(0,0,0,.08); }
@@ -476,12 +493,58 @@ form label { display: grid; gap: 8px; font: 600 14px var(--body); color: var(--h
 form input, form select, form textarea { font: 400 16px/1.4 var(--body); color: var(--hero-fg); background: #264532; border: 1px solid #3F6A4D; border-radius: 12px; padding: 13px 14px; width: 100%; color-scheme: dark; }
 form textarea { min-height: 120px; resize: vertical; }
 form .btn { justify-self: start; }
+/* Kontaktformular: alle Felder gleich groß, feste Maße auch beim Tippen/Autofill */
+#form { gap: 16px; align-content: start; }
+.contact-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; }
+@media (max-width: 820px) { .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+#form .row { align-items: end; }
+#form label { min-width: 0; transition: color .2s ease; }
+#form label:focus-within { color: var(--hero-fg); }
+#form input, #form select, #form textarea { display: block; min-width: 0; margin: 0; border-radius: 14px; transition: border-color .2s ease, background-color .2s ease, box-shadow .25s ease, transform .2s ease; }
+#form input, #form select { height: 56px; padding: 0 40px 0 16px; text-overflow: ellipsis; line-height: 56px; }
+#form select { -webkit-appearance: none; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C3D2BF' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px; }
+#form select option { background: #1F3D2B; color: #fff; }
+#form textarea { height: 140px; min-height: 140px; max-height: 140px; resize: none; padding: 14px 16px; line-height: 1.5; overflow-y: auto; }
+#form input::placeholder, #form textarea::placeholder { color: #8FA894; opacity: 1; }
+#form input:hover, #form select:hover, #form textarea:hover { border-color: #5C8A69; }
+#form input:focus, #form select:focus, #form textarea:focus { outline: none; border-color: var(--sky); background-color: #2A4C37; box-shadow: 0 0 0 4px rgba(168, 197, 160, .22); }
+/* Häkchen, sobald ein Pflichtfeld ausgefüllt ist (Platz dafür ist immer reserviert, damit nichts springt) */
+#form input[required]:not(:placeholder-shown) { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2E863' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px; }
+/* Autofill (Safari/Chrome) soll Farbe und Größe nicht verändern */
+#form input:-webkit-autofill, #form input:-webkit-autofill:hover, #form input:-webkit-autofill:focus { -webkit-text-fill-color: var(--hero-fg); caret-color: var(--hero-fg); -webkit-box-shadow: 0 0 0 100px #264532 inset; transition: background-color 9999s ease 0s; }
+#form input::-webkit-contacts-auto-fill-button, #form input::-webkit-credentials-auto-fill-button { visibility: hidden; pointer-events: none; position: absolute; right: 0; }
+/* Fortschritt */
+.f-progress { margin-top: 2px; display: flex; align-items: center; gap: 12px; font: 600 13px/1 var(--body); color: var(--hero-muted); }
+.f-progress .track { flex: 1; height: 4px; border-radius: 4px; background: #2F4F3A; overflow: hidden; }
+.f-progress .fill { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--sun); border-radius: inherit; transition: width .45s cubic-bezier(.2, .7, .2, 1); }
+#form .btn[type="submit"] { padding: 17px 26px; box-shadow: 0 10px 24px rgba(242, 232, 99, .0); transition: transform .15s ease, box-shadow .25s ease; }
+#form .btn[type="submit"]:hover { box-shadow: 0 12px 28px rgba(242, 232, 99, .25); }
+#form .btn[type="submit"] svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s ease; }
+#form .btn[type="submit"]:hover svg { transform: translateX(4px); }
+#form.ready .btn[type="submit"] { animation: readyPulse 1.6s ease-out 1; }
+@keyframes readyPulse { 0% { box-shadow: 0 0 0 0 rgba(242, 232, 99, .55); } 100% { box-shadow: 0 0 0 16px rgba(242, 232, 99, 0); } }
+/* Felder blenden beim Öffnen nacheinander ein */
+.js-motion .modal[open] .contact-grid > div > * , .js-motion .modal[open] #form > * { animation: fieldIn .55s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--d, 0) * 60ms + 120ms); }
+@keyframes fieldIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { #form *, .kit-mock::before { transition: none !important; animation: none !important; } }
 .sent { background: #264532; border: 1px solid var(--sky); border-radius: 12px; padding: 16px 18px; }
 
 footer { padding-block: 36px; border-top: 1px solid var(--line); }
 .foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
 .foot .wordmark { font-size: 20px; color: var(--fg); }
 .foot nav { display: flex; gap: 20px; }
+footer:has(.partners) { padding-top: 0; }
+.partners { display: grid; gap: 16px; padding-block: 40px 32px; margin-bottom: 32px; border-bottom: 1px solid var(--line); }
+.partner-list { display: flex; flex-wrap: wrap; gap: 14px; }
+.partner { display: flex; align-items: center; gap: 18px; padding: 16px 22px; min-height: 84px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); color: var(--fg); text-decoration: none; transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease; }
+.partner:hover { transform: translateY(-3px); border-color: var(--accent-ink); box-shadow: 0 14px 32px rgba(31, 61, 43, .1); }
+.partner img { display: block; height: 44px; width: auto; max-width: 200px; object-fit: contain; filter: grayscale(1); opacity: .8; transition: filter .3s ease, opacity .3s ease; }
+.partner:hover img, .partner:focus-visible img { filter: none; opacity: 1; }
+.partner-text { display: grid; line-height: 1.05; }
+.partner-text b { font: 700 20px/1.05 var(--display); letter-spacing: -0.02em; }
+.partner-text small { font: 600 11px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.partner-meta { font-size: 13.5px; color: var(--muted); padding-left: 18px; border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .partner { flex-wrap: wrap; } .partner-meta { padding-left: 0; border-left: 0; flex-basis: 100%; } }
 body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }
 </style>
 </head>
@@ -709,11 +772,11 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     </div>
     <form id="form" novalidate>
       <div class="row">
-        <label for="f-name">Dein Name<input id="f-name" name="name" required autocomplete="name"></label>
-        <label for="f-firma">Firma<input id="f-firma" name="firma" autocomplete="organization"></label>
+        <label for="f-name">Dein Name<input id="f-name" name="name" required autocomplete="name" placeholder="Max Mustermann"></label>
+        <label for="f-firma">Firma<input id="f-firma" name="firma" autocomplete="organization" placeholder="Muster GmbH"></label>
       </div>
       <div class="row">
-        <label for="f-mail">E-Mail oder Telefon<input id="f-mail" name="kontakt" required></label>
+        <label for="f-mail">E-Mail oder Telefon<input id="f-mail" name="kontakt" required autocomplete="email" placeholder="name@firma.de"></label>
         <label for="f-pkg">Paket
           <select id="f-pkg" name="paket">
             <option>Weiß ich noch nicht</option>
@@ -725,13 +788,24 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       </div>
       <label for="f-msg">Was macht deine Firma?<textarea id="f-msg" name="nachricht" placeholder="z. B. Malerbetrieb in Köln, 4 Mitarbeiter, brauchen neues Logo und Website"></textarea></label>
       <p class="privacy">Beim Absenden öffnet sich dein E-Mail-Programm mit einer vorausgefüllten Nachricht an uns. Deine Angaben nutzen wir nur, um deine Anfrage zu beantworten. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
-      <button class="btn btn-sun" type="submit">Anfrage senden</button>
+      <div class="f-progress" aria-hidden="true"><span class="track"><span class="fill" id="f-fill"></span></span><span id="f-count">0 von 3</span></div>
+      <button class="btn btn-sun" type="submit">Anfrage senden <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       <p class="sent" id="sent" role="status" hidden></p>
     </form>
   </div>
 </dialog>
 
 <footer class="on-light">
+  <div class="wrap partners" aria-labelledby="partner-title">
+    <span class="eyebrow" id="partner-title">Partner</span>
+    <div class="partner-list">
+      <a class="partner" href="https://www.it-webmedia.de" target="_blank" rel="noopener" aria-label="IT &amp; Webmedia GmbH – Webdesign &amp; IT-Betreuung (öffnet in neuem Tab)">
+        <img src="img/partner/it-webmedia.svg" alt="IT &amp; Webmedia GmbH" width="200" height="56" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+        <span class="partner-text" hidden><b>IT &amp; Webmedia</b><small>GmbH</small></span>
+        <span class="partner-meta">Webdesign &amp; IT-Betreuung · Hamburg</span>
+      </a>
+    </div>
+  </div>
   <div class="wrap foot">
     <span class="wordmark">Bran<span class="nn">n</span>dNew</span>
     <span>Deine Marke. Brandneu.</span>
@@ -796,17 +870,17 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
   const brands = [
     { label: "Kaffeerösterei", name: "Röstwerk Kessler", tagline: "Kleine Rösterei in der Altstadt", style: "Warm & handwerklich",
       font: "Georgia, 'Times New Roman', serif", fontName: "Klassische Serif", fontNote: "edel, ruhig, mit Tradition",
-      colors: [["Terrakotta", "#B5582F"], ["Creme", "#F3EBDD"], ["Espresso", "#3B2418"]],
+      colors: [["Terrakotta", "#B5582F"], ["Creme", "#F3EBDD"], ["Espresso", "#3B2418"]], mock: ["#3B2418", "#F3EBDD", "#B5582F"],
       shots: [["img/kessler-1.jpg", "Verpackung, Visitenkarten & Becher"], ["img/kessler-2.jpg", "Ladenfront & Schild"]],
       items: ["Wortmarke & Bohnen-Symbol", "Visitenkarten", "Etikett für Kaffeetüten", "Becher-Banderole", "Ladenschild & Markise"] },
     { label: "Physiotherapie", name: "Nordlicht Physiotherapie", tagline: "Praxis für Physiotherapie", style: "Ruhig & klar",
       font: "Inter, system-ui, sans-serif", fontName: "Moderne Sans", fontNote: "klar, freundlich, gut lesbar",
-      colors: [["Nachtblau", "#14306B"], ["Himmelblau", "#4FB3E3"], ["Eisblau", "#D6ECF8"]],
+      colors: [["Nachtblau", "#14306B"], ["Himmelblau", "#4FB3E3"], ["Eisblau", "#D6ECF8"]], mock: ["#14306B", "#D6ECF8", "#4FB3E3"],
       shots: [["img/nordlicht-1.jpg", "Briefpapier & Terminkarte"], ["img/nordlicht-2.jpg", "Empfang mit Wandlogo"]],
       items: ["Logo mit Ring-Symbol", "Briefpapier", "Terminkarten", "Wandlogo für den Empfang", "Vorlagen für Social Media"] },
     { label: "Dachdecker", name: "Dachbau Kraft", tagline: "Dachdeckerei & Spenglerei", style: "Kräftig & direkt",
       font: "'Space Grotesk', 'Arial Black', sans-serif", fontName: "Fette Grotesk", fontNote: "laut, stark, fällt auf", upper: true,
-      colors: [["Anthrazit", "#2A2D31"], ["Signalorange", "#F2701F"], ["Schiefer", "#6B7076"]],
+      colors: [["Anthrazit", "#2A2D31"], ["Signalorange", "#F2701F"], ["Schiefer", "#6B7076"]], mock: ["#2A2D31", "#FFFFFF", "#F2701F"],
       shots: [["img/kraft-1.jpg", "Visitenkarten, Klemmbrett & Helm"], ["img/kraft-2.jpg", "Fahrzeugbeschriftung"]],
       items: ["Logo mit Dach-Symbol", "Visitenkarten", "Klemmbrett & Arbeitskleidung", "Fahrzeugbeschriftung", "Bauschild"] }
   ];
@@ -815,7 +889,17 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     const [main, side] = b.shots;
     kit.innerHTML = `
       <figure class="shot main"><img src="${main[0]}" alt="${b.name}: ${main[1]}" width="1600" height="900"><figcaption>${main[1]}</figcaption></figure>
-      <figure class="shot side"><img src="${side[0]}" alt="${b.name}: ${side[1]}" width="1600" height="1200" loading="lazy"><figcaption>${side[1]}</figcaption></figure>
+      <div class="kit-col">
+        <figure class="shot side"><img src="${side[0]}" alt="${b.name}: ${side[1]}" width="1600" height="1200" loading="lazy"><figcaption>${side[1]}</figcaption></figure>
+        <div class="kit-mock" style="--mb:${b.mock[0]};--mf:${b.mock[1]};--ma:${b.mock[2]}">
+          <span class="tile-label">Markenvorschau</span>
+          <div class="mock-name"><b style="font-family:${b.font}${b.upper ? ";text-transform:uppercase" : ""}">${b.name}</b><small>${b.tagline}</small></div>
+          <div class="mock-foot">
+            <span class="mock-sw" aria-hidden="true">${b.colors.map(([, h]) => `<i style="background:${h}"></i>`).join("")}</span>
+            <a class="mock-cta" href="#pakete">So eins für deine Firma <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
       <div class="tile">
         <div class="kit-head"><h3>${b.name}</h3><p>${b.tagline}</p><span class="kit-style">Stil: ${b.style}</span></div>
         <div><span class="tile-label">Farben</span>
@@ -932,6 +1016,20 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     document.documentElement.classList.add("lock");
     if (canHover) $("f-name").focus();
   }
+  // Kontaktformular: Reihenfolge fürs Einblenden + Fortschritt (Name, Kontakt, Beschreibung)
+  [...contactDlg.querySelectorAll(".contact-grid > div > *, #form > *")].forEach((el, i) => el.style.setProperty("--d", i));
+  const formEl = $("form"), progFields = ["f-name", "f-mail", "f-msg"].map($);
+  function updateProgress() {
+    const n = progFields.filter((f) => f.value.trim()).length;
+    $("f-fill").style.setProperty("--p", n / progFields.length);
+    $("f-count").textContent = n === progFields.length ? "Alles da ✓" : `${n} von ${progFields.length}`;
+    const ready = n === progFields.length;
+    if (ready && !formEl.classList.contains("ready")) formEl.classList.add("ready");
+    if (!ready) formEl.classList.remove("ready");
+  }
+  formEl.addEventListener("input", updateProgress);
+  formEl.addEventListener("reset", () => setTimeout(updateProgress));
+  updateProgress();
   contactDlg.addEventListener("close", () => {
     document.documentElement.classList.remove("lock");
     if (location.hash === "#kontakt") history.replaceState(null, "", location.pathname + location.search);
