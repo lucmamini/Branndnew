@@ -536,14 +536,14 @@ footer { padding-block: 36px; border-top: 1px solid var(--line); }
 footer:has(.partners) { padding-top: 0; }
 .partners { display: grid; gap: 16px; padding-block: 40px 32px; margin-bottom: 32px; border-bottom: 1px solid var(--line); }
 .partner-list { display: flex; flex-wrap: wrap; gap: 14px; }
-.partner { display: flex; align-items: center; gap: 22px; padding: 18px 26px; min-height: 88px; border-radius: var(--r); background: #0A1922; border: 1px solid #0A1922; color: #fff; text-decoration: none; transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease; }
-.partner:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(10, 25, 34, .25); }
+.partner { display: flex; align-items: center; gap: 22px; padding: 18px 26px; min-height: 88px; border-radius: var(--r); background: #fff; border: 1px solid var(--line); color: var(--fg); text-decoration: none; transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease; }
+.partner:hover { transform: translateY(-3px); border-color: #63A0AB; box-shadow: 0 16px 36px rgba(13, 101, 152, .14); }
 .partner img { display: block; height: 54px; width: auto; max-width: 100%; opacity: .9; transition: opacity .3s ease; }
 .partner:hover img, .partner:focus-visible img { opacity: 1; }
 .partner-text { display: grid; line-height: 1.05; }
 .partner-text b { font: 700 20px/1.05 var(--display); letter-spacing: -0.02em; }
-.partner-text small { font: 600 11px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: #A9B6BD; }
-.partner-meta { font-size: 13.5px; color: #A9B6BD; padding-left: 22px; border-left: 1px solid rgba(255, 255, 255, .16); }
+.partner-text small { font: 600 11px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.partner-meta { font-size: 13.5px; color: var(--muted); padding-left: 22px; border-left: 1px solid var(--line); }
 @media (max-width: 520px) { .partner { flex-wrap: wrap; } .partner-meta { padding-left: 0; border-left: 0; flex-basis: 100%; } }
 body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important; }
 </style>
@@ -800,7 +800,7 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
     <span class="eyebrow" id="partner-title">Partner</span>
     <div class="partner-list">
       <a class="partner" href="https://www.it-webmedia.de" target="_blank" rel="noopener" aria-label="IT &amp; Webmedia GmbH – Webdesign &amp; IT-Betreuung (öffnet in neuem Tab)">
-        <img src="img/partner/it-webmedia.svg" alt="IT &amp; Webmedia GmbH" width="195" height="54" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+        <img src="img/partner/it-webmedia-farbig.svg" alt="IT &amp; Webmedia GmbH" width="195" height="54" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
         <span class="partner-text" hidden><b>IT &amp; Webmedia</b><small>GmbH</small></span>
         <span class="partner-meta">Webdesign &amp; IT-Betreuung · Hamburg</span>
       </a>
