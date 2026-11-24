@@ -371,36 +371,75 @@ html.lock { overflow: hidden; }
 .font-sample > span { font-size: 40px; font-weight: 700; line-height: 1; }
 .font-sample small { display: block; color: var(--muted); font-size: 13px; }
 .kit-note { margin-top: 20px; color: var(--muted); font-size: 14px; }
-/* Unser eigenes Brandkit (aufklappbar) */
-details.own { margin-top: 28px; padding: 0; border: 1px solid var(--line); border-radius: 22px; background: var(--surface, #fff); overflow: hidden; }
-details.own:first-of-type { border-top: 1px solid var(--line); }
-details.own summary { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: var(--navy); color: #fff; font: inherit; transition: background .2s ease; }
-details.own summary:hover { background: #26493A; }
-details.own summary::after { content: none; }
-.own-mark { flex: none; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 14px; background: #2C5139; font: 700 24px/1 var(--display); letter-spacing: -0.06em; color: #fff; }
-.own-mark span { color: var(--sun); }
-.own-t { flex: 1; min-width: 0; display: grid; gap: 3px; }
-.own-t b { font: 700 clamp(16px, 2.2vw, 20px)/1.25 var(--display); }
-.own-t small { color: #C3D2BF; font-size: 13.5px; }
-.own-plus { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--sun); position: relative; transition: transform .3s cubic-bezier(.2, .7, .2, 1); }
-.own-plus::before, .own-plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 2.5px; border-radius: 2px; background: var(--navy); transform: translate(-50%, -50%); }
-.own-plus::after { transform: translate(-50%, -50%) rotate(90deg); }
-details.own[open] .own-plus { transform: rotate(45deg); }
-.own-body { padding: clamp(18px, 3vw, 28px); display: grid; gap: 22px; }
-details.own[open] .own-body { animation: ownIn .45s cubic-bezier(.2, .7, .2, 1); }
-@keyframes ownIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-.own-intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 32px); align-items: center; }
-@media (max-width: 760px) { .own-intro { grid-template-columns: 1fr; } }
-.own-gif { margin: 0; border-radius: 16px; overflow: hidden; background: var(--navy); aspect-ratio: 16 / 9; }
-.own-gif img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.own-intro h3 { font: 700 clamp(20px, 2.6vw, 26px)/1.2 var(--display); margin: 0 0 10px; }
-.own-intro p { color: var(--muted); margin: 0 0 10px; max-width: 52ch; }
-.own-hint { font-size: 14px; }
-.own-pages { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 14px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-.own-pages a { flex: 0 0 min(78%, 460px); scroll-snap-align: start; display: block; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #fff; box-shadow: 0 8px 24px rgba(31, 61, 43, .08); transition: transform .2s ease, box-shadow .2s ease; position: relative; }
-.own-pages a:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(31, 61, 43, .14); }
-.own-pages img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 849; object-fit: cover; }
-.own-pages a { cursor: zoom-in; }
+/* Unser eigenes Brandkit als Blätterbuch */
+.fb-sec { margin-top: 56px; }
+.fb-head { display: grid; gap: 12px; justify-items: center; text-align: center; margin: 0 auto 26px; max-width: 640px; }
+.fb-head h3 { font: 700 clamp(26px, 3.6vw, 38px)/1.12 var(--display); letter-spacing: -0.02em; margin: 0; }
+.fb-head h3 span { color: var(--accent-ink); }
+.fb-head p { margin: 0; color: var(--muted); }
+.fb-wrap { position: relative; margin-inline: calc(50% - min(700px, 50vw - 12px)); border-radius: 26px; background: radial-gradient(120% 90% at 50% 0%, #EEF1E8 0%, #E3E9DC 100%); padding: clamp(22px, 4vw, 48px) clamp(8px, 3vw, 36px) 18px; overflow: hidden; }
+:root[data-theme="dark"] .fb-wrap { background: radial-gradient(120% 90% at 50% 0%, #22432F 0%, #182E21 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fb-wrap { background: radial-gradient(120% 90% at 50% 0%, #22432F 0%, #182E21 100%); } }
+.fb-stage { position: relative; display: flex; align-items: center; justify-content: center; outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.fb-stage:focus-visible .fb-book { outline: 3px solid var(--sun); outline-offset: 10px; border-radius: 4px; }
+.fb-book { position: relative; transition: transform .9s cubic-bezier(.45, .05, .25, 1); }
+.fb-book::after { content: ""; position: absolute; left: 6%; right: 6%; bottom: -26px; height: 30px; background: radial-gradient(50% 50% at 50% 50%, rgba(20, 40, 28, .28), transparent 70%); pointer-events: none; transition: left .9s, right .9s; }
+.fb-book.at-start::after { left: 53%; right: 3%; }
+.fb-book.at-end::after { left: 3%; right: 53%; }
+.fb-book.single::after { left: 4%; right: 4%; }
+.fb-leaf { position: absolute; top: 0; height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.45, .05, .25, 1); will-change: transform; cursor: pointer; }
+.fb-leaf.drag { transition: none; }
+.fb-leaf.gone { opacity: 0; transition: transform .9s cubic-bezier(.45, .05, .25, 1), opacity .25s ease .6s; pointer-events: none; }
+.fb-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #F7F7F2; overflow: hidden; }
+.fb-leaf.top .fb-face, .fb-leaf.turning .fb-face { box-shadow: 0 1px 2px rgba(20, 40, 28, .12), 0 12px 34px rgba(20, 40, 28, .16); }
+.fb-leaf.under .fb-face { box-shadow: 0 1px 0 rgba(20, 40, 28, .25), 1px 2px 0 rgba(20, 40, 28, .08); }
+.fb-face img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.fb-back { transform: rotateY(180deg); }
+.fb-front { border-radius: 0 4px 4px 0; }
+.fb-back { border-radius: 4px 0 0 4px; }
+/* Bundsteg: Schatten zur Mitte hin, Glanz beim Blättern */
+.fb-face::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.fb-front::before { background: linear-gradient(90deg, rgba(0, 0, 0, .22) 0%, rgba(0, 0, 0, .06) 3.5%, rgba(255, 255, 255, .06) 6%, transparent 12%); }
+.fb-back::before { background: linear-gradient(270deg, rgba(0, 0, 0, .22) 0%, rgba(0, 0, 0, .06) 3.5%, rgba(255, 255, 255, .06) 6%, transparent 12%); }
+.single .fb-front::before { background: linear-gradient(90deg, rgba(0, 0, 0, .12) 0%, transparent 5%); }
+.fb-face::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; opacity: var(--shade, 0); }
+.fb-front::after { background: linear-gradient(90deg, rgba(0, 0, 0, .05) 0%, rgba(0, 0, 0, .35) 100%); }
+.fb-back::after { background: linear-gradient(270deg, rgba(255, 255, 255, .25) 0%, rgba(0, 0, 0, .18) 100%); }
+.fb-leaf.turn .fb-face::after { animation: fbShade .9s cubic-bezier(.45, .05, .25, 1); }
+@keyframes fbShade { 0% { opacity: 0; } 50% { opacity: .9; } 100% { opacity: 0; } }
+/* Rückseite des Buchs */
+.fb-cover { width: 100%; height: 100%; background: #1F3D2B; display: grid; place-items: center; position: relative; }
+.fb-cover::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2.2%; background: var(--sun); }
+.fb-cover b { font: 700 clamp(40px, 9vw, 110px)/1 var(--display); letter-spacing: -0.06em; color: #2C5139; }
+.fb-cover b span { color: var(--sun); }
+.fb-cover small { position: absolute; bottom: 8%; color: #C3D2BF; font: 600 clamp(9px, 1.1vw, 13px)/1 var(--body); letter-spacing: .14em; text-transform: uppercase; }
+/* Pfeile seitlich */
+.fb-arr { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--surface); color: var(--fg); font-size: 20px; cursor: pointer; box-shadow: 0 6px 18px rgba(20, 40, 28, .16); transition: background .2s ease, color .2s ease, opacity .2s ease, transform .15s ease; }
+.fb-arr:hover { background: var(--navy); color: #fff; }
+.fb-arr:active { transform: translateY(-50%) scale(.94); }
+.fb-arr[disabled] { opacity: 0; pointer-events: none; }
+.fb-prev { left: 0; } .fb-next { right: 0; }
+@media (max-width: 719px) { .fb-arr { display: none; } }
+/* Leiste unten */
+.fb-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; margin-top: 18px; }
+.fb-bar button, .fb-bar a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; min-width: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: 600 14px/1 var(--body); text-decoration: none; cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease; }
+.fb-bar button:hover, .fb-bar a:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+.fb-bar .fb-dl { background: var(--sun); color: var(--navy); border-color: var(--sun); }
+.fb-bar .fb-dl:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+.fb-bar svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.fb-cnt { min-width: 150px; text-align: center; font: 600 14px/1.25 var(--body); color: var(--fg); }
+.fb-cnt small { display: block; color: var(--muted); font-weight: 400; font-size: 12.5px; }
+.fb-prog { height: 3px; border-radius: 3px; background: var(--line); margin: 42px auto 0; max-width: 420px; overflow: hidden; }
+.fb-prog i { display: block; height: 100%; width: 0; background: var(--accent-ink); transition: width .6s cubic-bezier(.45, .05, .25, 1); }
+.fb-hint { text-align: center; color: var(--muted); font-size: 13.5px; margin: 12px 0 0; }
+/* Vollbild */
+.fb-wrap.is-max { position: fixed; inset: 0; z-index: 250; border-radius: 0; display: flex; flex-direction: column; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: #13241A; }
+.fb-wrap.is-max .fb-cnt, .fb-wrap.is-max .fb-hint { color: #C3D2BF; }
+.fb-wrap.is-max .fb-cnt small { color: #8FA593; }
+.fb-wrap.is-max .fb-prog { background: #2F4F3A; }
+.fb-wrap.is-max .fb-prog i { background: var(--sun); }
+.fb-wrap.is-max .fb-bar button, .fb-wrap.is-max .fb-bar a:not(.fb-dl) { background: #1F3D2B; color: #fff; border-color: #2F4F3A; }
+.fb-wrap.is-max .fb-bar .fb-dl { background: var(--sun); color: var(--navy); }
 /* Großansicht */
 .lb { position: fixed; inset: 0; z-index: 300; background: rgba(15, 30, 21, .94); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); align-items: center; gap: 12px; padding: max(14px, env(safe-area-inset-top)) clamp(10px, 3vw, 28px) max(18px, env(safe-area-inset-bottom)); animation: lbIn .25s ease; }
 .lb[hidden] { display: none; }
@@ -422,11 +461,6 @@ details.own[open] .own-body { animation: ownIn .45s cubic-bezier(.2, .7, .2, 1);
   .lb-fig { grid-column: 1 / -1; grid-row: 2; }
   .lb-prev { grid-row: 3; justify-self: end; } .lb-next { grid-row: 3; justify-self: start; }
 }
-.own-nav { display: flex; justify-content: flex-end; gap: 8px; margin-top: -10px; }
-.own-nav button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-size: 18px; cursor: pointer; transition: background .2s ease, transform .15s ease; }
-.own-nav button:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
-.own-nav button:active { transform: scale(.94); }
-.own-pages span { position: absolute; left: 10px; bottom: 10px; background: rgba(31, 61, 43, .88); color: #fff; font: 600 12px/1 var(--body); padding: 6px 10px; border-radius: 999px; }
 
 .steps { --p: 1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
 .steps::before, .steps::after { content: ""; position: absolute; left: 0; top: 19px; height: 2px; border-radius: 2px; }
@@ -638,25 +672,29 @@ body { margin: 0; } img { max-width: 100%; } [hidden] { display: none !important
       <div class="kit" id="kit" role="tabpanel"></div>
       <p class="kit-note">Alle Firmen sind frei erfunden. Genau diese Bausteine bekommst du in deinem Paket, gestaltet für deine Firma.</p>
 
-      <details class="own" id="unser-brandkit">
-        <summary>
-          <span class="own-mark" aria-hidden="true">n<span>n</span></span>
-          <span class="own-t"><b>Echt statt erfunden: unser eigenes Brandkit</b><small>13 Seiten · Logo, Farben, Schrift, Drucksachen, Social Media</small></span>
-          <span class="own-plus" aria-hidden="true"></span>
-        </summary>
-        <div class="own-body">
-          <div class="own-intro">
-            <figure class="own-gif"><img src="img/brandkit/logo-animation.gif" alt="Animiertes BranndNew-Logo: das n wird gelb" width="640" height="360" loading="lazy"></figure>
-            <div>
-              <h3>So sieht das Ergebnis wirklich aus.</h3>
-              <p>Das hier ist unser eigener Auftritt, gebaut nach genau dem Paket, das du bei uns bekommst: Logo in drei Varianten, Farbwelt, Schriften, Visitenkarte, Briefpapier, Rechnung, Social-Media-Vorlagen, Banner und das animierte Logo.</p>
-              <p class="own-hint">Wische durch die Seiten oder tippe eine an, um sie groß zu sehen.</p>
-            </div>
-          </div>
-          <div class="own-pages" id="own-pages"></div>
-          <div class="own-nav"><button type="button" data-own="-1" aria-label="Vorherige Seite">←</button><button type="button" data-own="1" aria-label="Nächste Seite">→</button></div>
+      <div class="fb-sec" id="unser-brandkit">
+        <div class="fb-head">
+          <span class="eyebrow">Echt statt erfunden</span>
+          <h3>Blättere durch <span>unser eigenes</span> Brandkit.</h3>
+          <p>13 Seiten, gebaut nach genau dem Paket, das du bei uns bekommst: Logo in drei Varianten, Farbwelt, Schriften, Visitenkarte, Briefpapier, Rechnung, Social-Media-Vorlagen, Banner und das animierte Logo.</p>
         </div>
-      </details>
+        <div class="fb-wrap" id="fb-wrap">
+          <div class="fb-stage" id="fb-stage" tabindex="0" role="region" aria-roledescription="Blätterbuch" aria-label="BranndNew Brandkit zum Durchblättern. Pfeiltasten links und rechts blättern um.">
+            <button type="button" class="fb-arr fb-prev" id="fb-prev" aria-label="Zurückblättern">←</button>
+            <div class="fb-book" id="fb-book"></div>
+            <button type="button" class="fb-arr fb-next" id="fb-next" aria-label="Weiterblättern">→</button>
+          </div>
+          <div class="fb-prog" aria-hidden="true"><i id="fb-prog"></i></div>
+          <div class="fb-bar">
+            <button type="button" id="fb-first" aria-label="Zum Anfang"><svg viewBox="0 0 24 24"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+            <span class="fb-cnt" id="fb-cnt" aria-live="polite"></span>
+            <button type="button" id="fb-zoom" aria-label="Aktuelle Seite groß ansehen"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg><span>Groß</span></button>
+            <button type="button" id="fb-max" aria-label="Vollbild" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Vollbild</span></button>
+            <a class="fb-dl" href="vorlagen/BranndNew_Brandkit.pdf" download><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Als PDF</a>
+          </div>
+          <p class="fb-hint" id="fb-hint">Klicke auf eine Seite oder zieh sie zur Seite, um umzublättern.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1505,22 +1543,175 @@ ${sentVia === "db" ? `<h3>Danke, ${esc(sentName)}!</h3>
   document.querySelectorAll("main [data-add]").forEach((b) => b.addEventListener("click", () => addToCart(b.dataset.add)));
   updateCart();
 
-  // Unser eigenes Brandkit: Seiten erst beim Aufklappen laden
-  const ownD = document.getElementById("unser-brandkit"), ownP = document.getElementById("own-pages");
-  const OWN = ["Titel", "Marke", "Logo", "Logo-Regeln", "Farben", "Schrift", "Animiertes Logo", "Visitenkarte", "Briefpapier & Rechnung", "Social Media", "Stories", "Banner", "Kontakt"];
-  const ownFill = () => {
-    if (!ownD.open || ownP.childElementCount) return;
-    ownP.innerHTML = OWN.map((t, i) => { const f = "img/brandkit/seite-" + String(i + 1).padStart(2, "0") + ".jpg";
-      return `<a href="${f.replace(".jpg", "-gross.jpg")}" target="_blank" rel="noopener"><img src="${f}" alt="BranndNew Brandkit, Seite ${i + 1}: ${t}" width="1200" height="849" loading="lazy"><span>${String(i + 1).padStart(2, "0")} · ${t}</span></a>`; }).join("");
-  };
-  if (ownD && ownP) {
-    ownD.addEventListener("toggle", ownFill); ownFill();
-    ownD.querySelectorAll("[data-own]").forEach((b) => b.addEventListener("click", () => {
-      const a = ownP.querySelector("a"); if (!a) return;
-      ownP.scrollBy({ left: Number(b.dataset.own) * (a.offsetWidth + 14), behavior: "smooth" });
-    }));
+  // Unser eigenes Brandkit als Blätterbuch
+  const fbBook = document.getElementById("fb-book");
+  if (fbBook) {
+    const OWN = ["Titel", "Marke", "Logo", "Logo-Regeln", "Farben", "Schrift", "Animiertes Logo", "Visitenkarte", "Briefpapier & Rechnung", "Social Media", "Stories", "Banner", "Kontakt"];
+    const N = OWN.length, RATIO = 1200 / 849, DUR = 900;
+    const nr = (i) => String(i + 1).padStart(2, "0");
+    const small = (i) => "img/brandkit/seite-" + nr(i) + ".jpg";
+    const big = (i) => "img/brandkit/seite-" + nr(i) + "-gross.jpg";
+    const wrap = document.getElementById("fb-wrap"), stage = document.getElementById("fb-stage");
+    const bPrev = document.getElementById("fb-prev"), bNext = document.getElementById("fb-next");
+    const cnt = document.getElementById("fb-cnt"), prog = document.getElementById("fb-prog");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let spread = true, leaves = [], L = 0, cur = 0, pw = 0, busy = 0;
 
-    // Großansicht mit Pfeilen, Tastatur und Wischen
+    const face = (i, cls) => {
+      const d = document.createElement("div"); d.className = "fb-face " + cls;
+      if (i == null) return d;
+      if (i >= N) { d.innerHTML = '<div class="fb-cover"><b>n<span>n</span></b><small>branndnew.de</small></div>'; return d; }
+      d.innerHTML = `<img src="${small(i)}" srcset="${small(i)} 1200w, ${big(i)} 2800w" sizes="(min-width: 720px) 50vw, 100vw" alt="BranndNew Brandkit, Seite ${i + 1}: ${OWN[i]}" width="1200" height="849" decoding="async"${i > 2 ? ' loading="lazy"' : ""}>`;
+      return d;
+    };
+
+    // Seite links/rechts im aufgeschlagenen Zustand → Seitenindex
+    const pagesNow = () => {
+      if (!spread) return [cur];
+      const l = cur > 0 ? 2 * cur - 1 : null, r = cur < L ? 2 * cur : null;
+      return [l, r].filter((x) => x != null && x < N);
+    };
+
+    const build = () => {
+      const want = stage.clientWidth >= 720;
+      // aktuelle Seite beim Wechsel der Ansicht behalten
+      const page = leaves.length ? (pagesNow()[pagesNow().length - 1] ?? 0) : 0;
+      spread = want;
+      fbBook.innerHTML = ""; fbBook.classList.toggle("single", !spread);
+      const faces = spread ? [...Array(N + 1).keys()] : [...Array(N).keys()];
+      leaves = [];
+      if (spread) for (let i = 0; i < faces.length; i += 2) leaves.push([faces[i], faces[i + 1]]);
+      else faces.forEach((f) => leaves.push([f, null]));
+      L = leaves.length;
+      leaves = leaves.map(([f, b], i) => {
+        const el = document.createElement("div"); el.className = "fb-leaf";
+        el.appendChild(face(f, "fb-front")); el.appendChild(face(b, "fb-back"));
+        fbBook.appendChild(el); return el;
+      });
+      cur = spread ? Math.floor((page + 1) / 2) : Math.min(page, L - 1);
+      size(); render(true);
+    };
+
+    const size = () => {
+      const max = wrap.classList.contains("is-max");
+      const availW = stage.clientWidth - (spread ? 130 : 0);
+      const maxH = max ? innerHeight - 190 : Math.min(innerHeight * 0.72, 620);
+      pw = Math.floor(Math.min(availW / (spread ? 2 : 1), maxH * RATIO));
+      const ph = Math.round(pw / RATIO);
+      fbBook.style.width = (spread ? pw * 2 : pw) + "px"; fbBook.style.height = ph + "px";
+      leaves.forEach((el) => { el.style.width = pw + "px"; el.style.left = spread ? pw + "px" : "0"; });
+      stage.style.height = ph + "px";
+    };
+
+    const angleOf = (i) => (i < cur ? -180 : 0);
+    const render = (instant) => {
+      leaves.forEach((el, i) => {
+        if (instant) el.classList.add("drag");
+        el.style.transform = `perspective(${pw * 4}px) rotateY(${angleOf(i)}deg)`;
+        if (!el.classList.contains("turning")) el.style.zIndex = i < cur ? i + 1 : L - i;
+        el.classList.toggle("gone", !spread && i < cur);
+        el.classList.toggle("top", i === cur || (spread && i === cur - 1));
+        el.classList.toggle("under", i === cur + 1 || (spread && i === cur - 2));
+        if (instant) { void el.offsetWidth; el.classList.remove("drag"); }
+      });
+      const shift = spread ? (cur === 0 ? -pw / 2 : cur === L ? pw / 2 : 0) : 0;
+      fbBook.style.transform = `translateX(${shift}px)`;
+      fbBook.classList.toggle("at-start", spread && cur === 0);
+      fbBook.classList.toggle("at-end", spread && cur === L);
+      const last = spread ? L : L - 1;
+      bPrev.disabled = cur === 0; bNext.disabled = cur >= last;
+      const ps = pagesNow();
+      if (spread && cur === L) cnt.innerHTML = `Rückseite<small>Ende des Brandkits</small>`;
+      else cnt.innerHTML = `${ps.map((p) => p + 1).join("–")} / ${N}<small>${ps.map((p) => OWN[p]).join(" · ")}</small>`;
+      prog.style.width = (cur / last) * 100 + "%";
+    };
+
+    const turn = (dir) => {
+      const last = spread ? L : L - 1;
+      const next = cur + dir;
+      if (next < 0 || next > last) return;
+      const idx = dir > 0 ? cur : cur - 1, el = leaves[idx];
+      el.classList.add("turning"); el.style.zIndex = L + 10;
+      el.classList.remove("turn"); void el.offsetWidth; el.classList.add("turn");
+      cur = next; render(false); busy++;
+      setTimeout(() => { el.classList.remove("turning", "turn"); busy--; render(false); }, reduce ? 0 : DUR);
+    };
+    const go = (to) => { const d = Math.sign(to - cur); if (!d) return; turn(d); if (cur !== to) setTimeout(() => go(to), reduce ? 0 : 160); };
+
+    bPrev.addEventListener("click", () => turn(-1));
+    bNext.addEventListener("click", () => turn(1));
+    document.getElementById("fb-first").addEventListener("click", () => go(0));
+    stage.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); turn(1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); turn(-1); }
+    });
+
+    // Klicken, Ziehen und Ecke anheben
+    let drag = null, peekEl = null;
+    const local = (e) => { const r = fbBook.getBoundingClientRect(); return { x: e.clientX - r.left, w: r.width, inside: e.clientY >= r.top && e.clientY <= r.bottom && e.clientX >= r.left && e.clientX <= r.right }; };
+    const sideOf = (x, w) => (x > w / 2 ? 1 : -1);
+    const unpeek = () => { if (peekEl) { peekEl.style.transform = `perspective(${pw * 4}px) rotateY(${angleOf(leaves.indexOf(peekEl))}deg)`; peekEl = null; } };
+    fbBook.addEventListener("pointermove", (e) => {
+      if (drag || busy || e.pointerType !== "mouse") return;
+      const p = local(e), s = sideOf(p.x, p.w);
+      const edge = s > 0 ? p.w - p.x < pw * 0.28 : p.x < pw * 0.28;
+      const idx = s > 0 ? cur : cur - 1, el = leaves[idx];
+      const ok = edge && el && (spread || s > 0) && (spread || cur < L - 1);
+      if (!ok) { unpeek(); return; }
+      if (peekEl !== el) unpeek();
+      peekEl = el;
+      el.style.transform = `perspective(${pw * 4}px) rotateY(${s > 0 ? -14 : -166}deg)`;
+    });
+    fbBook.addEventListener("pointerleave", unpeek);
+    fbBook.addEventListener("pointerdown", (e) => {
+      if (busy || e.button > 0) return;
+      const p = local(e);
+      drag = { x0: e.clientX, y0: e.clientY, side: sideOf(p.x, p.w), on: false, id: e.pointerId };
+    });
+    addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      if (!drag.on) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) { if (Math.abs(dy) > 12) drag = null; return; }
+        const dir = dx < 0 ? 1 : -1, last = spread ? L : L - 1;
+        if (cur + dir < 0 || cur + dir > last) { drag = null; return; }
+        unpeek();
+        drag.on = true; drag.dir = dir; drag.el = leaves[dir > 0 ? cur : cur - 1];
+        drag.el.classList.add("drag", "turning"); drag.el.classList.remove("gone"); drag.el.style.zIndex = L + 10;
+        try { fbBook.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+      const p = Math.max(0, Math.min(1, (drag.dir > 0 ? -dx : dx) / (pw * (spread ? 1.6 : 1.1))));
+      drag.p = p;
+      const a = drag.dir > 0 ? -180 * p : -180 * (1 - p);
+      drag.el.style.transform = `perspective(${pw * 4}px) rotateY(${a}deg)`;
+      drag.el.style.setProperty("--shade", (Math.sin(p * Math.PI) * 0.9).toFixed(3));
+    });
+    const endDrag = (e) => {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      const d = drag; drag = null;
+      if (!d.on) {
+        if (e && e.type === "pointerup" && !busy) turn(d.side);
+        return;
+      }
+      d.el.classList.remove("drag"); d.el.style.removeProperty("--shade");
+      if (d.p > 0.25) { cur += d.dir; }
+      busy++; render(false);
+      setTimeout(() => { d.el.classList.remove("turning"); busy--; render(false); }, reduce ? 0 : DUR * 0.7);
+    };
+    addEventListener("pointerup", endDrag); addEventListener("pointercancel", endDrag);
+    fbBook.addEventListener("dragstart", (e) => e.preventDefault());
+
+    // Vollbild
+    const maxBtn = document.getElementById("fb-max");
+    const setMax = (on) => {
+      wrap.classList.toggle("is-max", on); maxBtn.setAttribute("aria-pressed", on);
+      maxBtn.querySelector("span").textContent = on ? "Schließen" : "Vollbild";
+      document.documentElement.style.overflow = on ? "hidden" : "";
+      build(); if (on) stage.focus();
+    };
+    maxBtn.addEventListener("click", () => setMax(!wrap.classList.contains("is-max")));
+
+    // Großansicht der aktuellen Seite mit Pfeilen, Tastatur und Wischen
     const lb = document.createElement("div");
     lb.className = "lb"; lb.hidden = true;
     lb.setAttribute("role", "dialog"); lb.setAttribute("aria-modal", "true"); lb.setAttribute("aria-label", "Brandkit-Seiten");
@@ -1531,29 +1722,32 @@ ${sentVia === "db" ? `<h3>Danke, ${esc(sentName)}!</h3>
     document.body.appendChild(lb);
     const lbImg = lb.querySelector("img"), lbCap = lb.querySelector("figcaption"), lbCnt = lb.querySelector(".lb-cnt");
     let lbI = 0, lbLast = null;
-    const src = (i) => "img/brandkit/seite-" + String(i + 1).padStart(2, "0") + "-gross.jpg";
     const show = (i, dir) => {
-      lbI = (i + OWN.length) % OWN.length;
-      lbImg.src = src(lbI); lbImg.alt = "BranndNew Brandkit, Seite " + (lbI + 1) + ": " + OWN[lbI];
-      lbCap.textContent = OWN[lbI]; lbCnt.textContent = (lbI + 1) + " / " + OWN.length;
+      lbI = (i + N) % N;
+      lbImg.src = big(lbI); lbImg.alt = "BranndNew Brandkit, Seite " + (lbI + 1) + ": " + OWN[lbI];
+      lbCap.textContent = OWN[lbI]; lbCnt.textContent = (lbI + 1) + " / " + N;
       lbImg.classList.remove("in-l", "in-r"); void lbImg.offsetWidth; if (dir) lbImg.classList.add(dir > 0 ? "in-r" : "in-l");
-      new Image().src = src((lbI + 1) % OWN.length); new Image().src = src((lbI - 1 + OWN.length) % OWN.length);
+      new Image().src = big((lbI + 1) % N); new Image().src = big((lbI - 1 + N) % N);
     };
     const open = (i) => { lbLast = document.activeElement; show(i, 0); lb.hidden = false; document.documentElement.style.overflow = "hidden"; lb.querySelector(".lb-next").focus(); };
-    const close = () => { lb.hidden = true; document.documentElement.style.overflow = ""; if (lbLast) lbLast.focus(); };
-    ownP.addEventListener("click", (e) => {
-      const a = e.target.closest("a"); if (!a) return;
-      e.preventDefault(); open([...ownP.children].indexOf(a));
-    });
+    const close = () => {
+      lb.hidden = true; document.documentElement.style.overflow = wrap.classList.contains("is-max") ? "hidden" : "";
+      // Buch auf die zuletzt angesehene Seite blättern
+      const target = spread ? (lbI === 0 ? 0 : Math.floor((lbI + 1) / 2)) : lbI;
+      if (target !== cur) { cur = target; render(true); }
+      if (lbLast) lbLast.focus();
+    };
+    document.getElementById("fb-zoom").addEventListener("click", () => { const ps = pagesNow(); open(ps.length ? ps[0] : N - 1); });
     lb.querySelector(".lb-prev").addEventListener("click", () => show(lbI - 1, -1));
     lb.querySelector(".lb-next").addEventListener("click", () => show(lbI + 1, 1));
     lb.querySelector(".lb-x").addEventListener("click", close);
     lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lb-fig")) close(); });
     document.addEventListener("keydown", (e) => {
-      if (lb.hidden) return;
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") show(lbI + 1, 1);
-      else if (e.key === "ArrowLeft") show(lbI - 1, -1);
+      if (!lb.hidden) {
+        if (e.key === "Escape") close();
+        else if (e.key === "ArrowRight") show(lbI + 1, 1);
+        else if (e.key === "ArrowLeft") show(lbI - 1, -1);
+      } else if (e.key === "Escape" && wrap.classList.contains("is-max")) setMax(false);
     });
     let tx = 0, ty = 0;
     lb.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
@@ -1561,6 +1755,10 @@ ${sentVia === "db" ? `<h3>Danke, ${esc(sentName)}!</h3>
       const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
       if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) show(lbI + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
     }, { passive: true });
+
+    let rT; addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => { if ((stage.clientWidth >= 720) !== spread) build(); else { size(); render(true); } }, 120); });
+    document.getElementById("fb-hint").textContent = matchMedia("(pointer: coarse)").matches ? "Tippe rechts oder wische, um umzublättern." : "Klicke auf eine Seite oder zieh sie zur Seite, um umzublättern.";
+    build();
   }
 
   onScroll();
